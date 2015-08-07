@@ -1,0 +1,49 @@
+{
+    "local": "English",
+    "lang": {
+        "TRAINER_NAME": "Trainer's title",
+        "TRAINER_TOPIC": "Trainer's topic",
+        "TOPIC": "Topic",
+        "MAX_SCORE": "Max score",
+        "NEXT_STEP": "Next step",
+        "PREV_STEP": "Previous step",
+        "ENTER_TEXT": "Enter text",
+        "CHOOSE_LANG": "Choose language",
+        "CHOOSE_SELECT": "Choose element from the list",
+		"TEACHER_HELP" : "Teachers help",
+		"CALCULATOR" : "Calculator",
+		
+		"CHECK": "Check",
+		"ATTEMPTS_LEFT": "Attempts left - ",
+		
+		
+		"RADIO_TEXT_1": "Radio #1",
+		"RADIO_TEXT_2": "Radio №2",
+		"RADIO_TEXT_3": "Radio №3",
+		"RADIO_TEXT_4": "Radio №4 (correct)",
+		
+		"CHECKBOX1": "Mark me!",
+		"CHECKBOX2": "Don't mark me!",
+		
+        "ELEMENTSTEST_OPTION_ONE": "Element 1",
+        "ELEMENTSTEST_OPTION_TWO": "Element 2",
+        "ELEMENTSTEST_OPTION_THREE": "Element 3 (right)",
+        "ELEMENTSTEST_TITLE": "Some elements test...",
+        "ELEMENTSTEST_CHOOSE_WRITE_OPTION": "Choose right element from the list",
+        "ELEMENTSTEST_ENTER_TEST": "Enter 'test' and 'Text' separated by comma into a text input",
+        "ELEMENTSTEST_PUT_DROPPABLE": "Drag answers #1 and #4 into droppable area",
+		"ELEMENTSTEST_PUT_INPUT1": "Enter numbers 1 OR 4",
+		"ELEMENTSTEST_ENTER_FLOAT_NUMBER": "Enter 4.5 or 4,5",
+
+        "RESULTS_TITLE": "Your scores",
+        "RESULTS_START_TIME": "You started at",
+        "RESULTS_END_TIME": "Finished at",
+        "RESULTS_TIME_DIFF": "Time to complete",
+        "RESULTS_TIME_SEC": "sec.",
+        "RESULTS_YOUR_SCORE": "Your score is",
+		
+		"POINTS1": "point",
+		"POINTS2": "point's",
+		"POINTS3": "point's"
+    }
+}

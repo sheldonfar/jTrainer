@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>jTrainer :: {{TRAINER_NAME}}</title>
+        <meta charset="UTF-8"/>
+        <meta name="description" content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="/javascripts/jtrainer/current/img/trainer/trainer-favicon.ico" type="image/x-icon">
+        <link rel="icon" href="/javascripts/jtrainer/current/img/trainer/trainer-favicon.ico" type="image/x-icon">
+
+        <!-- 3-d party scripts -->
+        <script src="/javascripts/jtrainer/current/js/jquery.min.js"></script>
+        <script src="/javascripts/jtrainer/current/js/jquery-ui-interactions.min.js"></script>
+        <script src="/javascripts/jtrainer/current/js/jquery.ui.touch-punch.min.js"></script>
+        <script src="/javascripts/jtrainer/current/js/mustache.js"></script>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="/javascripts/jtrainer/current/css/bootstrap.min.css" type="text/css"/>
+        <script src="/javascripts/jtrainer/current/js/bootstrap.min.js"></script>
+
+        <!-- jTrainer's styles -->
+        <link rel="stylesheet" href="/javascripts/jtrainer/current/css/trainer.style.css" type="text/css"/>
+		<link rel="stylesheet" href="/javascripts/jtrainer/current/css/HistrixCalculator.css" type="text/css"/>
+		<link rel="stylesheet" href="css/trainer.custom.css" type="text/css"/>
+        <!-- jTrainer's engine script -->
+        <script src="/javascripts/jtrainer/current/js/trainer.engine.js"></script>
+		
+		  <!-- Calculator & Canvas(screenshot) scripts -->    
+		<script type="text/javascript" src="/javascripts/jtrainer/current/js/HistrixCalculator.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+            <div class="navbar-header">
+                <div><a class="navbar-brand" href="#"><span class="trainer-brand"></span>{{TRAINER_NAME}}</a></div>
+            </div>
+        </nav>
+        <div class="modal modal-static fade" id="cogwheel-modal" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <img src="/javascripts/jtrainer/current/img/trainer/trainer-cogwheel.gif" class="icon"/>
+                            <h4><span id="cogwheel-desc">Processing</span>... </h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="stepspace">
+            <!-- Steps will be loaded here -->
+        </section>
+		
+        <div class="text-center rotators">
+            <div class="btn-group btn-group-md" >
+                <a id="prevController" href="javascript:void(0)" class="btn btn-default">{{PREV_STEP}}</a>
+				<button type="button" class="teacher-help btn btn-warning" onclick="Service.getHelp()">{{TEACHER_HELP}}</button>
+				<div class="calculator" id="calculator"></div>
+				<a id="calc" class="btn btn-success">{{CALCULATOR}}</a>
+                <a id="nextController" href="javascript:void(0)" class="btn btn-default">{{NEXT_STEP}}</a>
+				
+            </div>
+        </div>
+    </body>
+</html>
+<script type="text/javascript" src="/javascripts/jtrainer/current/js/additions/html2canvas.js"></script>

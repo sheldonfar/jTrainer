@@ -1,0 +1,49 @@
+{
+    "local": "Українська",
+    "lang": {
+        "TRAINER_NAME": "Назва тренажеру",
+        "TRAINER_TOPIC": "Тема тренажеру",
+        "TOPIC": "Тема",
+        "MAX_SCORE": "Кількість балів",
+        "NEXT_STEP": "Наступний крок",
+        "PREV_STEP": "Попередній крок",
+        "ENTER_TEXT": "Введіть текст",
+        "CHOOSE_LANG": "Оберіть мову",
+        "CHOOSE_SELECT": "Оберіть елемент зі списку",
+		"TEACHER_HELP" : "Допомога викладача",
+		"CALCULATOR" : "Калькулятор",
+		
+		"CHECK": "Перевірити",
+		"ATTEMPTS_LEFT": "Ще спроб - ",
+		
+		"RADIO_TEXT_1": "Радіо №1",
+		"RADIO_TEXT_2": "Радіо №2",
+		"RADIO_TEXT_3": "Радіо №3",
+		"RADIO_TEXT_4": "Радіо №4 (вірний)",
+		
+		"CHECKBOX1": "Правильна відповідь",
+		"CHECKBOX2": "Неправильна відповідь",
+		
+        "ELEMENTSTEST_OPTION_ONE": "Элемент 1",
+        "ELEMENTSTEST_OPTION_TWO": "Элемент 2",
+        "ELEMENTSTEST_OPTION_THREE": "Элемент 3 (правильний)",
+        "ELEMENTSTEST_TITLE": "Перевірка елементів...",
+        "ELEMENTSTEST_CHOOSE_WRITE_OPTION": "Оберіть коректний елемент зі списку",
+        "ELEMENTSTEST_ENTER_TEST": "Введіть в поле текст 'test' и 'Text' через кому",
+        "ELEMENTSTEST_PUT_DROPPABLE": "Перетащіть відповіді 1 і 4",
+		"ELEMENTSTEST_PUT_INPUT1": "Введіть числа 1 АБО 4",
+		"ELEMENTSTEST_ENTER_FLOAT_NUMBER": "Введіть 4.5 або 4,5",
+
+        "RESULTS_TITLE": "Ваші результати",
+        "RESULTS_START_TIME": "Час початку тестування",
+        "RESULTS_END_TIME": "Час завершення тестування",
+        "RESULTS_TIME_DIFF": "Час виконання",
+        "RESULTS_TIME_SEC": "сек.",
+        "RESULTS_YOUR_SCORE": "Ви отримали",
+		
+		"POINTS1": "бал",
+		"POINTS2": "бали",
+		"POINTS3": "балів"
+
+    }
+}
