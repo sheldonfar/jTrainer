@@ -11,5 +11,6 @@ jTrainer is a Javascript framework for creating e-trainers and is now under acti
 * mustache.js
 
 # Credits
-Credits for initial creating go to github.com/wingsofovnia
-Further development by github.com/sheldonfar
+Credits for initial creating go to http://github.com/wingsofovnia
+
+Further development by http://github.com/sheldonfar
