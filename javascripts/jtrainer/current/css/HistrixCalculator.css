@@ -328,3 +328,7 @@ div.calculator {
 .label {
 	color: black !important;
 }
+span {
+	padding: 0 !important;
+}
+}

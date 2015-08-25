@@ -35,23 +35,23 @@
     <!-- Bases -->
     <div class="up scientific">
         <div class="left_side">
-            <input type="radio" name="base" value="hexadecimal"/><span class="label">Hex &nbsp;</span>
-            <input type="radio" name="base" value="decimal" checked="checked"/><span class="label">Dec &nbsp;</span>
-            <input type="radio" name="base" value="octal"/><span class="label">Oct &nbsp;</span>
-            <input type="radio" name="base" value="binary"/><span class="label">Bin</span>
+            <input type="radio" id="calc-input" name="base" value="hexadecimal"/><span class="label">Hex &nbsp;</span>
+            <input type="radio" id="calc-input" name="base" value="decimal" checked="checked"/><span class="label">Dec &nbsp;</span>
+            <input type="radio" id="calc-input" name="base" value="octal"/><span class="label">Oct &nbsp;</span>
+            <input type="radio" id="calc-input" name="base" value="binary"/><span class="label">Bin</span>
         </div>
 
         <div class="right_side">
             <span class="decimal">
-                <input type="radio" name="metric" value="degrees"/><span class="label">Degrees &nbsp;</span>
-                <input type="radio" name="metric" value="radians" checked="checked"/><span class="label">Radians &nbsp;</span>
-                <input type="radio" name="metric" value="grads"/><span class="label">Grads</span>
+                <input type="radio" id="calc-input" name="metric" value="degrees"/><span class="label">Degrees &nbsp;</span>
+                <input type="radio" id="calc-input" name="metric" value="radians" checked="checked"/><span class="label">Radians &nbsp;</span>
+                <input type="radio" id="calc-input" name="metric" value="grads"/><span class="label">Grads</span>
             </span>
             <span class="hexadecimal octal binary">
-                <input type="radio" name="range" value="qword" checked="checked"/><span class="label">Qword &nbsp;</span>
-                <input type="radio" name="range" value="dword"/><span class="label">Dword &nbsp;</span>
-                <input type="radio" name="range" value="word"/><span class="label">Word &nbsp;</span>
-                <input type="radio" name="range" value="byte"/><span class="label">Byte</span>
+                <input type="radio" id="calc-input" name="range" value="qword" checked="checked"/><span class="label">Qword &nbsp;</span>
+                <input type="radio" id="calc-input" name="range" value="dword"/><span class="label">Dword &nbsp;</span>
+                <input type="radio" id="calc-input" name="range" value="word"/><span class="label">Word &nbsp;</span>
+                <input type="radio" id="calc-input" name="range" value="byte"/><span class="label">Byte</span>
             </span>
         </div>
     </div>
@@ -120,9 +120,9 @@
 
             <div class="row">
                 <div class="inv_hyp_column">
-                    <input type="checkbox" name="inv" value="inv"/> <span class="label">Inv</span>
+                    <input type="checkbox" id="calc-input" name="inv" value="inv"/> <span class="label">Inv</span>
                     &nbsp;&nbsp;
-                    <input type="checkbox" name="hyp" value="hyp"/> <span class="label">Hyp</span>
+                    <input type="checkbox" id="calc-input" name="hyp" value="hyp"/> <span class="label">Hyp</span>
                 </div>
 
                 <span class="square read_only"><input type="text" name="par" readonly="readonly"/></span>

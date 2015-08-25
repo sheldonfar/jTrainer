@@ -159,7 +159,7 @@ div.form-group{
 	margin-bottom	:0px;
 	display			:inline-block;
 }
-input[type=radio], input[type=checkbox]  {
+input[type=radio]:not(#calc-input), input[type=checkbox]:not(#calc-input) {
 	min-width: 30px !important;
 	max-height: 30px !important;
 	margin-right: 10px;
