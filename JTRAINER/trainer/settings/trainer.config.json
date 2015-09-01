@@ -6,5 +6,5 @@
     },
     "DEFAULT_LANG": "ru",
     "TRAINER_SCORE": 30,
-    "PRODUCTION": true
+    "PRODUCTION": false
 }

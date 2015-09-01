@@ -7,6 +7,7 @@ var introduction = function () {
 		$('div.flag-icon').each(function() {
 			$(this).attr('onclick', 'window.location.href = \'?lang=\' + $(this).attr("id")');
 		});
+		//alert(Rotator.getStepsCount());
     }
 
     this.mustache = function () {
