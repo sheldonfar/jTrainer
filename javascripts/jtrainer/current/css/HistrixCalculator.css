@@ -21,7 +21,7 @@
 
 #HistrixCalculator
 	{
-	width: 450px;
+	width: 470px;
 	margin: 0 auto;
 	font-size: 9pt;
 	text-align: center;
@@ -40,6 +40,7 @@
 
 #HistrixCalculator div.header
 	{
+	cursor: move;
 	color: white;
 	font-size: 9pt;
 	font-weight: bold;
@@ -59,7 +60,7 @@
 #HistrixCalculator div.down div.left
 	{
 	float: left;
-	width: 164px;
+	width: 170px;
 	}
 
 
@@ -73,7 +74,7 @@
 #HistrixCalculator div.up div.left_side
 	{
 	float: left;
-	width: 195px;
+	width: 213px;
 	padding: 3px 0;
 	}
 
@@ -93,11 +94,10 @@
 #HistrixCalculator .inv_hyp_column
 	{
 	float: left;
-	width: 113px;
+	width: 115px;
 	padding: 5px 0;
 	margin-top: 2px;
 	margin-left: 3px;
-	margin-right: 2px;
 	border: 1px solid #c0c0c0;
 	}
 
@@ -136,7 +136,7 @@
 
 #HistrixCalculator div.mode select,
 #HistrixCalculator div.mode option
-	{ font-size: 8pt; }
+	{ font-size: 8pt; color: #000; width: 75px; }
 
 
 /* ----- Botones ----- */
@@ -317,7 +317,6 @@
 	
 }
 div.calculator {
-	cursor: move;
 	position: absolute;
 	display:none;
 	min-height: 245px;
@@ -328,7 +327,7 @@ div.calculator {
 .label {
 	color: black !important;
 }
-span {
+#HistrixCalculator span {
 	padding: 0 !important;
 }
 }

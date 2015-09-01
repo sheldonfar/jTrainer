@@ -11,7 +11,15 @@
         "CHOOSE_LANG": "Выберите язык",
         "CHOOSE_SELECT": "Выберите элемент из списка",
 		"TEACHER_HELP" : "Помощь преподавателя",
+		"ENTER_HELP_TEXT": "Опишите с чем Вам нужна помощь...",
+		"HELP_REQUEST_SEND": "Отправить",
+		"HELP_REQUEST_CLOSE": "Отмена",
 		"CALCULATOR" : "Калькулятор",
+		"ALERT_WELL_DONE": "Отлично!",
+		"ALERT_FAIL": "Плохо!",
+		"ALERT_STEP_SUCCESS": " Шаг пройден! Перейдите к следующему.",
+		"ALERT_STEP_FAIL": " Шаг провален. Перейдите к следующему.",
+		"STEP_COUNT": "Количество шагов",
 		
 		"CHECK": "Проверить",
 		"ATTEMPTS_LEFT": "Еще попыток - ",
@@ -42,6 +50,7 @@
         "RESULTS_TIME_DIFF": "Время выполнения",
         "RESULTS_TIME_SEC": "сек.",
         "RESULTS_YOUR_SCORE": "Вы набрали",
+		"STEP": "Шаг",
 		
 		"POINTS1": "балл",
 		"POINTS2": "балла",

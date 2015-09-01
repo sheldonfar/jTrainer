@@ -1,17 +1,18 @@
 .modal-static {
-    position    : fixed;
-    top         : 50% !important;
-    left        : 50% !important;
-    margin-top  : -100px;
-    margin-left : -100px;
-    overflow    : visible !important;
+   position    : fixed;
+   top         : 50% !important;
+   left        : 50% !important;
+   margin-top  : -100px;
+   margin-left : -100px;
+   overflow    : visible !important;
+
 }
 
 .modal-static,
 .modal-static .modal-dialog,
 .modal-static .modal-content {
-    width  : 200px;
-    height : 200px;
+    width  : 150px;
+    height : 150px;
 }
 
 .modal-static .modal-dialog,
@@ -28,32 +29,14 @@
     transition         : all 0.7s ease;
 }
 
-.has-success .form-control,
-.has-success .checkbox,
-.has-success .radio,
-.has-success .droppable {
-    border-color       : #3c763d;
-    background         : rgb(219, 255, 219);
-    -webkit-box-shadow: 0px 0px 14px 0px rgba(103, 188, 104, 0.77);
-	-moz-box-shadow:    0px 0px 14px 0px rgba(103, 188, 104, 0.77);
-	box-shadow:         0px 0px 14px 0px rgba(103, 188, 104, 0.77);
-}
-
-.has-error .form-control,
-.has-error .checkbox,
-.has-error .radio,
-.has-error .droppable {
-    border-color       : #a94442;
-    background         : rgb(255, 234, 234);
-	-webkit-box-shadow: 0px 0px 14px 0px rgba(206, 132, 131, 0.77);
-	-moz-box-shadow:    0px 0px 14px 0px rgba(206, 132, 131, 0.77);
-	box-shadow:         0px 0px 14px 0px rgba(206, 132, 131, 0.77);
-}
-
 body {
     background-image : url("/javascripts/jtrainer/current/img/trainer/trainer-background.png");
+	height: 100%;
 }
-
+html {
+    position: relative;
+    min-height: 100%;
+}
 .navbar-brand {
     color          : #efc84a !important;
     padding-top    : 0;
@@ -109,7 +92,6 @@ div.droppable, div.draggable {
 div.droppable {
     display            : block;
     padding            : 4.4px 4px;
-    margin             : 5px 0;
     line-height        : 1.428571429;
     background-color   : #ffffff;
     border             : 1px solid #cccccc;
@@ -152,16 +134,14 @@ select.form-control {
 	display: inline-block !important;
 }
 input.form-control{
-	display		: inline-block;
-	text-align	:center;
+	display: inline-block;
+	text-align: center;
 }
 div.form-group{
 	margin-bottom	:0px;
 	display			:inline-block;
 }
 input[type=radio]:not(#calc-input), input[type=checkbox]:not(#calc-input) {
-	min-width: 30px !important;
-	max-height: 30px !important;
 	margin-right: 10px;
 }
 
@@ -176,4 +156,43 @@ input[type=radio], input[type=checkbox]{
 }
 img[name=langs] {
 	cursor: pointer;
+}
+.flag-icon-ua {
+	background-image: url(../img/flags/ua.svg);
+}
+.flag-icon-ru {
+	background-image: url(../img/flags/ru.svg);
+}
+.flag-icon-en {
+	background-image: url(../img/flags/en.svg);
+}
+.flag-icon {
+	background-size: contain;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	position: relative;
+	display: inline-block;
+	width: 1.33333333em;
+	line-height: 1em;
+	width: 80px;
+	height: 60px;
+	border: 1px solid #ecf0f1;
+	border-radius: 4px;
+	cursor: pointer;
+}
+div.trainer-progress-bar {
+	position: absolute;
+	bottom:0;
+	width: 100%;
+	left: 0;
+    bottom: 0;
+	margin: 0;
+	overflow:hidden;
+}
+div.validation-alert {
+	position: fixed;
+    top: 0;
+    left: 25%;
+    width: 50%;
+	display: none;
 }

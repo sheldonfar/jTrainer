@@ -1,29 +1,32 @@
-var VElements;
+var VElements;// A variable for future validator
 var elementstest = function () {
     var plot = null;
     this.preDispatch = function (callback) {
-        var w = new WolframAlpha();
+        var w = new WolframAlpha(); // Making a call to wolfram api to build a plot
         w.setQuery('3x2+2x+5').plot(function (data) {
             plot = '<img src="' + data + '">';
             callback();
-        })
+        });
+		
+		
     }
 
     this.postDispatch = function () {
         VElements = new Validator();
 		//first param - DOM object, second - correct value or array of values, third - if there are multiple correct answers
-		//fourth - if you need to have 2 answers at the same time
+		//fourth - if you need to have 2 answers at the same time to be entered
         VElements.addValidator($('select[name="test-select"]'), 2)
-            .addValidator($('input[name="test-textinput"]'), ['test', 'Text'], false, true)
+            .addValidator($('input[name="test-textinput"]'), ['test', 'Text'], false, true) //It means user is required to enter both 'test' and 'text' separated by comas. They will be validated separately
             .addValidator($('div.droppable[name="test-droppable"]'), ['one', 'four'], false, true) //<----- Please, don't use numbers as values if you want multiple answers at same time
-			.addValidator($('input[name="test-input1"]'), ['1','4'],true, false)
+			.addValidator($('input[name="test-input1"]'), ['1','4'],true, false) // It means 1 and 4 will be correct
 			.addValidator($('input[name="test-radios"]'), 'fourr')
-			.addValidator($('input[name="test-input"]'), 4.5)
+			.addValidator($('input[name="test-input"]'), 4.5) // Either 4.5 and 4,5 will be correct
 			.addValidator($('input[name="test-checkbox1"]'), "test1")
 			.addValidator($('input[name="test-checkbox2"]'), "test2")
-            .setStrictMode(true)
-            .setIgnoreCase(false)
-			//.disableAnswersBacklight(true); -- Disable green/red color of correct/incorrect answers
+            .setStrictMode(true) // Restrict number of attempts to 3 (default)
+            .setIgnoreCase(false) // Ignore letter case (eg. TEXT, text)
+			.enableStepFinishAlert(true); // Enable showing alert after step is done
+			//.disableAnswersBacklight(true); //-- Disable green/red color of correct/incorrect answers
 			
         $('button.check').click(function () {			
 			VElements.fixRadio('test-radios'); // This is how you make radio buttons work
@@ -31,7 +34,7 @@ var elementstest = function () {
 			VElements.fixCheckbox('test-checkbox2', true); // This is how you make checkboxes work. Second param - if you want un-checked state to be correct answer
 			
 			VElements.setAttemptsOnCheckButton($(this)); //dynamically changing amount of attempts left on check button
-			VElements.validate();
+			VElements.validate(); // validate the validators
 			
 			
 			/* IN ACTIVE DEVELOPMENT 
@@ -39,6 +42,7 @@ var elementstest = function () {
 				$(this).resizeText({ maxFontPixels: 50 });
 			});
 			*/
+			
         });
     }
 

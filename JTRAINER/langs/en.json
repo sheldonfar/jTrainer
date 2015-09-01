@@ -10,7 +10,16 @@
         "ENTER_TEXT": "Enter text",
         "CHOOSE_LANG": "Choose language",
         "CHOOSE_SELECT": "Choose element from the list",
-		"TEACHER_HELP" : "Teachers help",
+		"TEACHER_HELP": "Teachers help",
+		"ENTER_HELP_TEXT": "Describe what you are having problem with...",
+		"HELP_REQUEST_SEND": "Send",
+		"HELP_REQUEST_CLOSE": "Cancel",
+		"ALERT_WELL_DONE": "Well done!",
+		"ALERT_FAIL": "Oh snap!",
+		"ALERT_STEP_SUCCESS": " Step done perfectly! Go to next one.",
+		"ALERT_STEP_FAIL": " Unfortunately step is failed. Go to next one.",
+		"STEP_COUNT": "Number of steps",
+		
 		"CALCULATOR" : "Calculator",
 		
 		"CHECK": "Check",

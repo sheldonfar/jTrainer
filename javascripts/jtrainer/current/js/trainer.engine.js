@@ -372,7 +372,8 @@ Templatetor.constructor.prototype.templatable = function (t) {
 var Scorer = new
     (function () {
         var score;
-
+		var userStepScores = [];
+		
         var startTime;
         var endTime;
         var diffTime;
@@ -404,7 +405,21 @@ var Scorer = new
             else if (s > totalScore)
                 throw new IllegalStateException("Illegal adding");
             score += s;
+			this.addUserStepScores(s);
         };
+		
+		 /**
+         * Adds points to user's global score
+         * @param s {Number} amount of points
+         */
+        this.addUserStepScores = function (s) {
+            if (typeof s !== "number")
+                throw new IllegalStateException("Start scorer first!");
+            else if (s > totalScore)
+                throw new IllegalStateException("Illegal adding");
+			userStepScores.push(s);
+        };
+
 
         /**
          * Gets a time when monitoring was started
@@ -437,7 +452,7 @@ var Scorer = new
         };
 
         /**
-         * Gets a total score of user
+         * Gets a total users score
          * @returns {Number} user's total score or false, if monitoring is not finished yet.
          */
         this.getScore = function () {
@@ -445,7 +460,27 @@ var Scorer = new
                 throw new IllegalStateException("Finish scorer first!");
             return score;
         };
-
+		
+		/**
+         * Gets a total users score in percent
+         * @returns {Number} user's total score or false, if monitoring is not finished yet.
+         */
+        this.getScoreInPercent = function () {
+            if (!endTime)
+                throw new IllegalStateException("Finish scorer first!");
+            return (score / totalScore * 100).toFixed(0);
+        };
+		
+		/**
+         * Gets an array of users scores
+         * @returns {Array} of user's step scores or false, if monitoring is not finished yet.
+         */
+        this.getUserStepScores = function () {
+            if (!endTime)
+                throw new IllegalStateException("Finish scorer first!");
+            return userStepScores;
+        };
+		
         /**
          * Gets a trainer's score
          * @returns {Number} user's total score or false, if monitoring is not finished yet.
@@ -636,10 +671,11 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '2.4 build17022015';
+            var trainerVersion = '3.0';
             var trainerSetting = null;
             var reportUrl;
-			var help_canvas;
+			var help_canvas
+			
             /**
              * Sets trainer's config file path
              * @param p {String} path to trainer's config file
@@ -775,6 +811,7 @@ var ScriptInvoker;
                         throw new IllegalAsyncStateException(exception);
                     });
             };
+			
 			/**
              * Get's help from SSU server
              * @param callback func i'll call when transferring is done
@@ -782,34 +819,47 @@ var ScriptInvoker;
 			this.getHelp = function (callback) {
 				Cogwheel.show();
 				Scorer.end();
-				var helper = prompt('Help message:');
+				var helper = $('input#helpInput').val();
+				$('button#closeButton').click();
+				window.setTimeout(function() {
+					help_canvas = getCanvas();
+				}, 1000);
+				
+				if (!reportUrl)
+					throw new IllegalStateException('Server is not notified yet');
+						
+				var uScore = _Scorer.getScore().toFixed(0);
+				var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
+				$.post(reportUrl, {
+					total_points: _Scorer.getTotalScore(),
+					user_points: uScore,
+					is_done: 1,
+					is_passed: 0,
+					help_image: help_canvas,
+					help_text: helper,
+					user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
+				}).done(function (data) {
+						LOGGER.debug("RESULT: " + data);
+						if (typeof callback === "function")
+							callback(data);
+					}).fail(function (jqxhr, settings, exception) {
+						throw new IllegalAsyncStateException(exception);
+					});			
+				Cogwheel.hide();
+            };
+			
+			/**
+             * Render's document body into a canvas
+             * @returns Canvas toDataURL
+             */
+			var getCanvas = function() {
 				html2canvas(document.body, {
 					onrendered: function(canvas) {
 						help_canvas = canvas.toDataURL();
-						if (!reportUrl)
-							throw new IllegalStateException('Server is not notified yet');
-						
-						var uScore = _Scorer.getScore().toFixed(0);
-						var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-						$.post(reportUrl, {
-							total_points: _Scorer.getTotalScore(),
-							user_points: uScore,
-							is_done: 1,
-							is_passed: 0,
-							help_image: help_canvas,
-							help_text: helper,
-							user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-						}).done(function (data) {
-								LOGGER.debug("RESULT: " + data);
-								if (typeof callback === "function")
-									callback(data);
-							}).fail(function (jqxhr, settings, exception) {
-								throw new IllegalAsyncStateException(exception);
-							});			
 					}
 				});
-				Cogwheel.hide();
-            };
+				return help_canvas;
+			};
         });
 })(jQuery, Scorer, Logger);
 
@@ -1379,6 +1429,7 @@ var DraggableGroup = null;
 var DroppableArea = null;
 
 var WolframAlpha = null;
+var GoogleCharts = null;
 var LateX = null;
 
 (function ($, _Templatetor, _StepInvoker) {
@@ -1406,6 +1457,7 @@ var LateX = null;
         this.render = function () {
             if (!this.getName() || !this.getValue())
                 throw new NoArgumentException('Check name and value of element');
+			this.removeClass('form-control');
             var result = '<div class="radios" for="' + this.getName() + '">\n';
             result += '<label id="radios">\n';
             result += '<input type="radio"' + this.getParams() + 'values="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
@@ -1492,6 +1544,7 @@ var LateX = null;
             this.render = function () {
                 if (!this.getName())
                     throw new NoArgumentException('Please check element\'s name.');
+				this.removeClass('form-control');
                 var result = '<div class="form-group" for="' + this.getName() + '">\n';
                 result += '<div class="checkbox">\n';
                 result += '<label>\n';
@@ -1805,7 +1858,68 @@ var LateX = null;
                 }
             };
         };
-
+	
+	/**
+     * This class is a wrapper to WolframAlpha API.
+     * @constructor
+     */
+    GoogleCharts =
+        function () {
+            var query;
+			var chartType;
+			var chartData;
+			var chartOptions;
+			var chartLibrary;
+			
+			this.setType = function (type) {
+				if (typeof type !== "string")
+                    throw new IllegalArgumentException("chartType should be a string");
+				chartType = type;
+			};
+			
+			this.setData = function (data) {
+				if(!Array.isArray(data))
+					throw new IllegalArgumentException("chartData should be an array!");
+				chartData = data;
+			};
+			
+			this.setOptions = function (options) {
+				if(typeof options !== 'object')
+					throw new IllegalArgumentException("chartOptions should be an json object!");
+				chartOptions = options;
+			};
+			
+			this.setLibrary = function (library) {
+				if (typeof library !== "string")
+                    throw new IllegalArgumentException("chartLibrary should be a string");
+				chartLibrary = library;
+			};
+			
+            /**
+             * Performs a query with WolframAlpha API through SumDU server
+             * @param callback {function} callback to call after loading
+             */
+            this.doQuery = function (id) {
+                $.ajax({
+				  url: 'https://www.google.com/jsapi?callback',
+				  cache: true,
+				  dataType: 'script',
+				  success: function(){
+					google.load('visualization', '1.1', {packages:[chartType], 'callback' : function() {
+						var data = google.visualization.arrayToDataTable(chartData);
+									
+						var chart = eval("new " + chartLibrary + "(id[0])");
+						chart.draw(data, chartOptions);
+					}
+					});
+				  }
+				
+				}).fail(function() {
+					 throw new IllegalAsyncStateException("Problem with building a chart");
+				 });
+            };
+        };
+		
     /**
      * Class for rendering LateX formulas
      * @constructor
@@ -1937,7 +2051,8 @@ var Rotator = null;
             var SETTINGS_PATH = STEP_PATH + 'settings/trainer.steps.json';
             var settings = null;
             var stepSpace = null;
-
+			var stepsCount = 0;
+			
             var lastLoadedStep = 0;
             var visibleStep = 0;
 
@@ -2053,7 +2168,7 @@ var Rotator = null;
              */
             this.setStepSpace = function (ss) {
                 if (!(ss instanceof $))
-                    throw new IllegalArgumentException('Step\'s space should be an instance if jQuery');
+                    throw new IllegalArgumentException('Step\'s space should be an instance of jQuery');
                 else if (ss.length == 0)
                     throw new IllegalStateException('There is no such element in DOM');
                 stepSpace = ss;
@@ -2069,7 +2184,19 @@ var Rotator = null;
                     throw new IllegalStateException('Step space is undefined');
                 stepSpace.append(data);
             };
-
+			
+			/**
+             * Gets a max score for next step
+             * @param step {Number} step's index
+             * @returns {Numeric} amount of points for this step
+             */
+            this.getStepsCount = function () {
+                if (stepsCount)
+                    return stepsCount;
+                else
+                    throw new llegalStateException('stepsCount is not initialized');
+            };
+			
             /**
              * Loads step's setting file
              * @param callback {function} callback to call after loading
@@ -2081,6 +2208,7 @@ var Rotator = null;
                 }).done(function (data) {
                         LOGGER.info('Settings data loaded...');
                         settings = data;
+						stepsCount = settings.length;
                         LOGGER.debug(settings);
                         if (typeof(callback) === "function")
                             callback();
@@ -2115,6 +2243,9 @@ var Rotator = null;
                 }
                 $.getScript(SCRIPTS_PATH + settings[step]['filename'] + '.js')
                     .done(function (script) {
+						if(settings[step]['score'] === 0) {
+							_Scorer.addScore(0);
+						}
                         LOGGER.info('Step\'s script loaded...');
                         var stepJSObject = window[settings[step]['filename']];
                         LOGGER.debug(stepJSObject);
@@ -2195,6 +2326,7 @@ var Rotator = null;
             var fadeStepIn = function (id, callback) {
                 if (id >= settings.length)
                     throw new IllegalStateException('Step <' + id + '> is not loaded');
+				changeBarProgress($('div.trainer-progress-bar div'), Rotator.getStepsCount(), id + 1);
                 var old = stepSpace.find('div[data-step="' + visibleStep + '"]');
                 if (old.is(':visible')) {
                     old.slideToggle().promise()
@@ -2256,6 +2388,30 @@ var Rotator = null;
                 else
                     return settings[visibleStep + 1]['score'];
             };
+			
+			/**
+             * Gets an array of scores for each step
+             * @returns {Array} of scores
+             */
+            this.getAllStepScores = function () {
+				var scores = [];
+                var totalSteps = Object.keys(settings).length;
+				for ( var i = 0; i < totalSteps; i++)
+					scores.push(settings[i].score);
+				return scores;
+            };
+			
+			/**
+             * Gets an array of step names for each step
+             * @returns {Array} of step names
+             */
+            this.getAllStepNames = function () {
+				var names = [];
+                var totalSteps = Object.keys(settings).length;
+				for ( var i = 0; i < totalSteps; i++)
+					namess.push(settings[i].filename);
+				return names;
+            };
 
             /**
              * Performs transition to the next level
@@ -2280,6 +2436,9 @@ var Rotator = null;
                 }
                 next >= lastLoadedStep ? this.disableNextButton() : this.enableNextButton();
                 this.enablePrevButton();
+				
+				$('div.validation-alert-success').fadeOut();
+				$('div.validation-alert-danger').fadeOut();
                 return true;
             };
 
@@ -2326,6 +2485,18 @@ var Rotator = null;
                     });
                 });
             };
+			
+			/**
+             * Changes progres bar's fullness
+             */
+            var changeBarProgress = function (bar, total, next) {
+                if(total != 0)
+					fullness = (next / total * 100).toFixed(1) + '%';
+				else
+					fullness = '0%';
+				bar.width(fullness);
+				return true;
+            };
         });
 })(jQuery, Logger, Templatetor, Scorer, Service, StepInvoker, Cogwheel);	
 
@@ -2362,8 +2533,8 @@ var Validator = null;
 			
 			var penalty = 0.5;
 			var currentMaxScore = _Rotator.getNextStepScore();
-			
 			var dab = false;
+			var esfa = false;
             /**
              * Sets a strict mode for Validator
              * @param b {Boolean} strict mode switch
@@ -2405,8 +2576,8 @@ var Validator = null;
              * @returns {Validator} current object (flow)
              */
             this.getAttempts = function () {
-                if (typeof attempts !== "number" || attempts <= 0)
-                    throw new IllegalArgumentException("Amount of attempts should be a number greater then zero"); 
+                if (typeof attempts !== "number")
+                    throw new IllegalArgumentException("Amount of attempts should be a number"); 
                 return attempts;
             };
 			
@@ -2419,7 +2590,7 @@ var Validator = null;
                 if (typeof b !== "object")
                     throw new IllegalArgumentException("Check button should be an object");
 				
-				var result = '{{CHECK}} ({{ATTEMPTS_LEFT}}' + (this.getAttempts() - 1) + ')';
+				var result = '{{CHECK}} ({{ATTEMPTS_LEFT}}' + (attempts - 1 >= 0 ? attempts - 1 : 0) + ')';
 				if (_Templatetor.templatable(result))
                     result = new _Templatetor().setTemplate(result).render();
                 b.html(result);
@@ -2474,6 +2645,17 @@ var Validator = null;
                 dab = b;
                 return this;
 			}
+			
+			/**
+             * Enables alert popup after success/fail to do a step
+             */
+			this.enableStepFinishAlert = function(b) {
+				if (typeof b !== "boolean")
+                    throw new IllegalArgumentException("Enabling step finish alert trigger should be boolean");
+                esfa = b;
+                return this;
+			}
+			
             /**
              * Adds an object to observe by the Validator.
              * @param o {jQuery} wrapped DOM element where to get value to check
@@ -2499,7 +2681,7 @@ var Validator = null;
                 targets.push([o, v, !!multicorrect, !!multiple]);
                 return this;
             };
-	
+			
             /**
              * Method validates all Validator's observables.
              */
@@ -2569,8 +2751,9 @@ var Validator = null;
                 LOGGER.debug("----------- FOR LOOP END ------------- ");
                 if (checkState === true) {
                     _Rotator.enableNextButton();
-                    _Scorer.addScore(currentMaxScore);
+                    _Scorer.addScore(Math.round(currentMaxScore));
                     fulfilled = true;
+					if(esfa) $('div.validation-alert-success').fadeIn();
                 } else {
                     if (isStrict === true) {
                         attempts--;
@@ -2580,12 +2763,13 @@ var Validator = null;
 					if (attempts <= 0) {
 						LOGGER.debug("NO attempts left");
 						_Rotator.enableNextButton();
-						var stepScore = _Rotator.getStepScore();
+						var stepScore = currentMaxScore;
                         var totalElements = targets.length;
                         var scoreOfOne = stepScore / totalElements;
                         var score = stepScore - scoreOfOne * invalidTargets;
-                        _Scorer.addScore(score);
+                        _Scorer.addScore(Math.round(score));
                         fulfilled = true;
+						if (esfa) $('div.validation-alert-danger').fadeIn();
                         return;
 					}
                     
