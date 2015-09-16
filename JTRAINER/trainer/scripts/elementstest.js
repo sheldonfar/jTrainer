@@ -2,11 +2,11 @@ var VElements;// A variable for future validator
 var elementstest = function () {
     var plot = null;
     this.preDispatch = function (callback) {
-        var w = new WolframAlpha(); // Making a call to wolfram api to build a plot
-        w.setQuery('3x2+2x+5').plot(function (data) {
-            plot = '<img src="' + data + '">';
-            callback();
-        });
+         var w = new WolframAlpha(); // Making a call to wolfram api to build a plot
+         w.setQuery('3x2+2x+5').plot(function (data) {
+             plot = '<img src="' + data + '">';
+             callback();
+         });
 		
 		
     }
@@ -27,8 +27,7 @@ var elementstest = function () {
             .setIgnoreCase(false) // Ignore letter case (eg. TEXT, text)
 			.enableStepFinishAlert(true); // Enable showing alert after step is done
 			//.disableAnswersBacklight(true); //-- Disable green/red color of correct/incorrect answers
-			
-        $('button.check').click(function () {			
+		$('button.check').click(function () {			
 			VElements.fixRadio('test-radios'); // This is how you make radio buttons work
 			VElements.fixCheckbox('test-checkbox1', false); // This is how you make checkboxes work. Second param - if you want un-checked state to be correct answer
 			VElements.fixCheckbox('test-checkbox2', true); // This is how you make checkboxes work. Second param - if you want un-checked state to be correct answer

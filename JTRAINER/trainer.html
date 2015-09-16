@@ -69,12 +69,13 @@
 				<h4 class="modal-title" id="myModalLabel">{{TEACHER_HELP}}</h4>
 			  </div>
 			  <div class="modal-body">
-				<p>{{ENTER_HELP_TEXT}}</p>
-				<input type="text" class="form-control" id="helpInput">
+			    <label class="control-label">{{ENTER_HELP_TEXT}}</label>
+				<input type="text" class="form-control" id="helpInput"></input>
+				
 			  </div>
 			  <div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">{{HELP_REQUEST_CLOSE}}</button>
-				<button type="button" class="btn btn-primary" onclick="Service.getHelp()">{{HELP_REQUEST_SEND}}</button>
+				<button type="button" class="btn btn-primary" onclick="Service.getHelpModal()">{{HELP_REQUEST_SEND}}</button>
 			  </div>
 			</div>
 		  </div>
@@ -94,12 +95,4 @@
 		</div>
     </body>	
 </html>
-<script type="text/javascript">
-	$("#calc").click(function() {
-		$('div.calculator').load('/javascripts/jtrainer/current/calc.html').css('display', 'block');
-	});
-    $(function() {
-		$( "#calculator" ).draggable();
-	});
-</script>
 <script type="text/javascript" src="/javascripts/jtrainer/current/js/additions/html2canvas.js"></script>

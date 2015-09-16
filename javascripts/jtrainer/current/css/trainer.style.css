@@ -11,8 +11,8 @@
 .modal-static,
 .modal-static .modal-dialog,
 .modal-static .modal-content {
-    width  : 150px;
-    height : 150px;
+    width  : 170px;
+    height : 170px;
 }
 
 .modal-static .modal-dialog,
@@ -195,4 +195,19 @@ div.validation-alert {
     left: 25%;
     width: 50%;
 	display: none;
+}
+div.droppable-area.has-success {
+	border-color       : #4caf50;
+    background         : #4caf50;
+    -webkit-box-shadow : inset 0 0.5px 0.5px rgba(0, 0, 0, 0.075), 0 0 3px #4caf50;
+    box-shadow         : inset 0 0.5px 0.5px rgba(0, 0, 0, 0.075), 0 0 3px #4caf50;
+}
+div.droppable-area.has-error {
+	border-color       : #D20300;
+    background         : rgb(255, 234, 234);
+    -webkit-box-shadow : inset 0 0.5px 0.5px rgba(0, 0, 0, 0.075), 0 0 3px #D20300;
+    box-shadow         : inset 0 0.5px 0.5px rgba(0, 0, 0, 0.075), 0 0 3px #D20300;
+}
+label#radios {
+	cursor: pointer;
 }

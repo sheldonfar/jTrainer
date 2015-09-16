@@ -816,11 +816,49 @@ var ScriptInvoker;
              * Get's help from SSU server
              * @param callback func i'll call when transferring is done
              */
-			this.getHelp = function (callback) {
+			this.getHelpModal = function (callback) {
+				Cogwheel.setText("Sending screenshot");
 				Cogwheel.show();
 				Scorer.end();
 				var helper = $('input#helpInput').val();
 				$('button#closeButton').click();
+				window.setTimeout(function() {
+					help_canvas = getCanvas();
+				}, 1000);
+				
+				if (!reportUrl)
+					throw new IllegalStateException('Server is not notified yet');
+						
+				var uScore = _Scorer.getScore().toFixed(0);
+				var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
+				$.post(reportUrl, {
+					total_points: _Scorer.getTotalScore(),
+					user_points: uScore,
+					is_done: 1,
+					is_passed: 0,
+					help_image: help_canvas,
+					help_text: helper,
+					user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
+				}).done(function (data) {
+						LOGGER.debug("RESULT: " + data);
+						if (typeof callback === "function")
+							callback(data);
+					}).fail(function (jqxhr, settings, exception) {
+						throw new IllegalAsyncStateException(exception);
+					});			
+				Cogwheel.hide();
+            };
+			
+			
+			/**
+			 * CAREFUL THIS IS LEFT FOR COMPATIBILITY WITH OLDER VERSIONS - DO NOT USE ANYMORE
+             * Get's help from SSU server
+             * @param callback func i'll call when transferring is done
+             */
+			this.getHelp = function (callback) {
+				Cogwheel.show();
+				Scorer.end();
+				var helper = prompt("Please enter help message text:")
 				window.setTimeout(function() {
 					help_canvas = getCanvas();
 				}, 1000);
@@ -1461,9 +1499,9 @@ var LateX = null;
             var result = '<div class="radios" for="' + this.getName() + '">\n';
             result += '<label id="radios">\n';
             result += '<input type="radio"' + this.getParams() + 'values="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
-            result += '</label>\n<span class="radio-text">';
+            result += '\n<span class="radio-text">';
 			result += this.getLabel();
-            result += '</span></div>';
+            result += '</span></label></div>';
 	
             if (_Templatetor.templatable(result))
                     result = new _Templatetor().setTemplate(result).render();
@@ -1734,7 +1772,7 @@ var LateX = null;
                 if (this.getName().length == 0)
                     throw new Error('Please check element\'s name');
                 this.removeClass('form-control').addClass('droppable');
-                var result = '<div class="form-group" for="' + this.getName() + '">\n';
+                var result = '<div class="form-group droppable-area" for="' + this.getName() + '">\n';
                 result += '<div' + this.getParams() + '></div>\n';
                 result += '</div>\n';
                 if (_Templatetor.templatable(result))
@@ -2623,7 +2661,7 @@ var Validator = null;
              */
 			this.fixRadio = function(o) {
 				var checked = $(':radio[name="' + o + '"]').filter(":checked").attr('values');
-				$('input[name="' + o + '"]').attr('value',checked);
+				$('input[name="' + o + '"]').attr('value', checked);
 			}
 			
 			/**
@@ -2633,7 +2671,7 @@ var Validator = null;
 			this.fixCheckbox = function(o, n) {
 				if (n) checked = $(':input[name="' + o + '"]').not(":checked").attr('values');
 				else checked = $(':input[name="' + o + '"]').filter(":checked").attr('values');
-				$('input[name="' + o + '"]').attr('value',checked);
+				$('input[name="' + o + '"]').attr('value', checked);
 			}
 			
 			/**
@@ -2693,9 +2731,9 @@ var Validator = null;
                     throw new IllegalStateException('I ended up here. Stop clicking validate!');
                 else if ($.isEmptyObject(targets))
                     throw new IllegalStateException('Targets are empty, nothing to check');
-             /*   else if (attempts <= 0)
+                else if (attempts <= 0)
                     throw new IllegalStateException('No attempts left. Go next level.');
-			*/
+			 
                 LOGGER.debug("----------- FOR LOOP ------------- ");
                 var checkState = true,
                     invalidTargets = 0;
