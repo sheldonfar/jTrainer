@@ -663,7 +663,7 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '3.10';
+            var trainerVersion = '3.15';
             var trainerSetting = null;
             var reportUrl;
             var help_canvas;

@@ -8,8 +8,17 @@
     <link rel="shortcut icon" href="/javascripts/jtrainer/current/img/trainer/trainer-favicon.ico" type="image/x-icon">
     <link rel="icon" href="/javascripts/jtrainer/current/img/trainer/trainer-favicon.ico" type="image/x-icon">
 
-    <!-- 3-d party scripts -->
+    <script>
+        var startTime = (new Date()).getTime();
+    </script>
     <script src="/javascripts/jtrainer/current/js/jquery.min.js"></script>
+    <script>
+        $(window).load(function () {
+            var endTime = (new Date()).getTime();
+            var secondsLoading = ((endTime - startTime) / 1000).toFixed(4);
+            $('.page-loading').append(secondsLoading + ' seconds.');
+        });
+    </script>
     <script src="/javascripts/jtrainer/current/js/jquery-ui-interactions.min.js"></script>
     <script src="/javascripts/jtrainer/current/js/jquery.ui.touch-punch.min.js"></script>
     <script src="/javascripts/jtrainer/current/js/mustache.js"></script>
@@ -38,6 +47,7 @@
                         class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></button>
                 <ul class="dropdown-menu" aria-labelledby="menu">
                     <li><a href="#" data-toggle="modal" data-target="#aboutModal">About</a></li>
+                    <li><a href="#" class="page-loading text-muted"><span class="is-faded">Page generated in </span></a></li>
                 </ul>
             </div>
             <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
