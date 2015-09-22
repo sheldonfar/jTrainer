@@ -20,5 +20,6 @@ function makeDroppable(elementName) {
             parent.attr("value", parentValue.replace("," + answerValue, "").replace(answerValue + ",", "").replace(answerValue, ""));
             $(this).attr('style', 'position:relative').appendTo('div.draggables[name="' + parentSelector + '"]').draggable("enable").unbind('click');
         });
+        $(this).trigger('drop:after')
     }});
 }
