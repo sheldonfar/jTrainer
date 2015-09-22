@@ -10,6 +10,10 @@ jTrainer is a Javascript framework for creating e-trainers and is now under acti
 * HistrixCalculator
 * mustache.js
 
+
+# Demo
+You can see a live demo at http://sheldonfar.com/jtrainer/index.html
+
 # Credits
 Credits for initial creating go to http://github.com/wingsofovnia
 
