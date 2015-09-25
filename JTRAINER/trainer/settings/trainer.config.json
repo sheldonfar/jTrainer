@@ -6,5 +6,6 @@
     },
     "DEFAULT_LANG": "ru",
     "TRAINER_SCORE": 30,
+    "TRAINER_AUTHOR": "Yevhenii Minin",
     "PRODUCTION": false
 }

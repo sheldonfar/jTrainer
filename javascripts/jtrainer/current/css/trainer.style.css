@@ -77,10 +77,6 @@ div.step.current {
     z-index: 1;
 }
 
-div.rotators a.btn {
-    margin-bottom: 20px;
-}
-
 div.latex {
     display: inline-block;
     padding: 3px;
@@ -239,4 +235,8 @@ label#radios {
 
 .glyphicon-option-vertical {
     font-size: 1.9em;
+}
+
+div.calculator {
+    display: none;
 }

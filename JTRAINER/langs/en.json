@@ -19,7 +19,10 @@
 		"ALERT_STEP_SUCCESS": " Step done perfectly! Go to next one.",
 		"ALERT_STEP_FAIL": " Unfortunately step is failed. Go to next one.",
 		"STEP_COUNT": "Number of steps",
-		
+		"END_TRAINER": "End trainer",
+        "END_ARE_YOU_SURE": "Are you sure you want to end trainer execution?",
+        "END_TRAINER_CLOSE": "Cancel",
+        "END_TRAINER_SEND": "End",
 		"CALCULATOR" : "Calculator",
 		
 		"CHECK": "Check",

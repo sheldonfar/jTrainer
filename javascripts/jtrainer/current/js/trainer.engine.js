@@ -31,10 +31,8 @@ $(document).ready(function () {
         else
             I18N.setLanguage(config['DEFAULT_LANG']);
 
+        $('#aboutBody').html(Service.about()).append("</br><strong>Current trainer author: </strong>" + config['TRAINER_AUTHOR']);
 
-        if (document.getElementById("aboutBody") !== null) {
-            document.getElementById("aboutBody").innerHTML = Service.about();
-        }
         Cogwheel.setText('Loading language file');
         I18N.loadLanguage(function () {
             Cogwheel.setText('Reading language file');
@@ -667,6 +665,7 @@ var ScriptInvoker;
             var trainerSetting = null;
             var reportUrl;
             var help_canvas;
+            var is_passed = 1;
 
             /**
              * Sets trainer's config file path
@@ -746,7 +745,7 @@ var ScriptInvoker;
              * @returns string with info about jTrainer
              */
             this.about = function () {
-                return '<h4>jTrainer v' + trainerVersion + '\nSumDU Distance Learning E-Trainer</h4>\n<br><strong>Authors</strong>: Ilia Ovchinnikov & Yevhenii Minin';
+                return '<h4>jTrainer v' + trainerVersion + '\nSumDU Distance Learning E-Trainer</h4>\n<br><strong>Framework authors</strong>: Ilia Ovchinnikov & Yevhenii Minin';
             };
 
             /**
@@ -794,7 +793,7 @@ var ScriptInvoker;
                     total_points: _Scorer.getTotalScore(),
                     user_points: uScore,
                     is_done: 1,
-                    is_passed: 1,
+                    is_passed: is_passed,
                     user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
                 }).done(function (data) {
                     LOGGER.debug("RESULT: " + data);
@@ -803,6 +802,16 @@ var ScriptInvoker;
                 }).fail(function (jqxhr, settings, exception) {
                     throw new IllegalAsyncStateException(exception);
                 });
+            };
+
+            /**
+             * Pushes user's results to SSU server
+             * @param callback func i'll call when transferring is done
+             */
+            this.pushResultsEarly = function (callback) {
+                Scorer.end();
+                is_passed = 0;
+                pushResults();
             };
 
             /**
@@ -1245,7 +1254,7 @@ var Map = function () {
 
 //--------------------------------ELEMENTS PART-----------------------------------------------------
 function Element() {
-        this.name,
+    this.name,
         this.label,
         this.value,
         this.attributes = '',
@@ -1902,7 +1911,6 @@ var LateX = null;
      */
     GoogleCharts =
         function () {
-            var query;
             var chartType;
             var chartData;
             var chartOptions;
@@ -1950,11 +1958,11 @@ var LateX = null;
                                 chart.draw(data, chartOptions);
                             }
                         });
+                    },
+                    error: function () {
+                        throw new IllegalAsyncStateException("Problem with building a chart");
                     }
-
-                }).fail(function () {
-                    throw new IllegalAsyncStateException("Problem with building a chart");
-                });
+                })
             };
         };
 

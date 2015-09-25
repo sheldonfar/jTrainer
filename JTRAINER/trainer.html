@@ -28,9 +28,10 @@
     <script src="/javascripts/jtrainer/current/js/bootstrap.min.js"></script>
 
     <!-- jTrainer's styles -->
+
     <link rel="stylesheet" href="/javascripts/jtrainer/current/css/trainer.style.css" type="text/css"/>
-    <link rel="stylesheet" href="/javascripts/jtrainer/current/css/HistrixCalculator.css" type="text/css"/>
     <link rel="stylesheet" href="css/trainer.custom.css" type="text/css"/>
+    <!--<link rel="stylesheet" href="/javascripts/jtrainer/current/css/HistrixCalculator.css" type="text/css"/>-->
     <!-- jTrainer's engine script -->
     <script src="/javascripts/jtrainer/current/js/trainer.engine.js"></script>
 </head>
@@ -91,7 +92,7 @@
     <div class="btn-group btn-group-md">
         <a id="prevController" href="javascript:void(0)" class="btn btn-default">{{PREV_STEP}}</a>
         <a href="javascript:void(0)" class="teacher-help btn btn-warning" data-toggle="modal" data-target="#helpModal">{{TEACHER_HELP}}</a>
-        <a id="calc" class="btn btn-success">{{CALCULATOR}}</a>
+        <a id="endTrainer" class="btn btn-danger" data-toggle="modal" data-target="#endModal">{{END_TRAINER}}</a>
         <a id="nextController" href="javascript:void(0)" class="btn btn-default">{{NEXT_STEP}}</a>
     </div>
 </div>
@@ -112,8 +113,26 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{HELP_REQUEST_CLOSE}}</button>
-                <button type="button" class="btn btn-primary" onclick="Service.getHelpModal()">{{HELP_REQUEST_SEND}}
-                </button>
+                <button type="button" class="btn btn-primary" onclick="Service.pushResultsEarly()">{{HELP_REQUEST_SEND}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- This is modal popup which shows up after click on "End trainer" button -->
+<div class="modal fade" id="endModal" tabindex="-1" role="dialog" aria-labelledby="endModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeButton"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="endModalLabel">{{END_TRAINER}}</h4>
+            </div>
+            <div class="modal-body">
+                <label class="control-label">{{END_ARE_YOU_SURE}}</label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{END_TRAINER_CLOSE}}</button>
+                <button type="button" class="btn btn-primary" onclick="Service.getHelpModal()">{{END_TRAINER_SEND}}</button>
             </div>
         </div>
     </div>
@@ -138,7 +157,7 @@
 <script type="text/javascript">
     $("#calc").click(function () {
         $('div.calculator').load("/javascripts/jtrainer/current/calc.html").css('display', 'block').draggable({
-            cancel: '#result'
-        });
+           cancel: '#result'
+       });
     });
 </script>
