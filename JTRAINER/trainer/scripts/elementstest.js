@@ -21,27 +21,16 @@ var elementstest = function () {
             .addValidator($('input[name="test-input1"]'), ['1', '4'], true, false) // It means 1 and 4 will be correct
             .addValidator($('input[name="test-radios"]'), 'fourr')
             .addValidator($('input[name="test-input"]'), 4.5) // Either 4.5 and 4,5 will be correct
-            .addValidator($('input[name="test-checkbox1"]'), "test1")
-            .addValidator($('input[name="test-checkbox2"]'), "test2")
+            .addValidator($('input[name="test-checkbox1"]'), true)
+            .addValidator($('input[name="test-checkbox2"]'), false)
             .setStrictMode(true) // Restrict number of attempts to 3 (default)
             .setIgnoreCase(false) // Ignore letter case (eg. TEXT, text)
             .enableStepFinishAlert(true); // Enable showing alert after step is done
-        //.disableAnswersBacklight(true); //-- Disable green/red color of correct/incorrect answers
-        $('button.check').click(function () {
-            VElements.fixRadio('test-radios'); // This is how you make radio buttons work
-            VElements.fixCheckbox('test-checkbox1', false); // This is how you make checkboxes work. Second param - if you want un-checked state to be correct answer
-            VElements.fixCheckbox('test-checkbox2', true); // This is how you make checkboxes work. Second param - if you want un-checked state to be correct answer
+            //.disableAnswersBacklight(true); //-- Disable green/red color of correct/incorrect answers
 
+        $('button.check').click(function () {
             VElements.setAttemptsOnCheckButton($(this)); //dynamically changing amount of attempts left on check button
             VElements.validate(); // validate the validators
-
-
-            /* IN ACTIVE DEVELOPMENT
-             $('div.draggable').each(function() {
-             $(this).resizeText({ maxFontPixels: 50 });
-             });
-             */
-
         });
     };
 

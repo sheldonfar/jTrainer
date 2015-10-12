@@ -16,7 +16,7 @@ $(document).ready(function () {
             $.ajaxSetup({cache: false});
             Logger.debugging();
         }
-
+        Rotator.setBreadCrumb($('.bc-steps'));
         Cogwheel.setText('Setting up step rotator');
         Rotator.setStepSpace($('section.stepspace'));
         Rotator.setNextButton($('#nextController'))
@@ -31,7 +31,7 @@ $(document).ready(function () {
         else
             I18N.setLanguage(config['DEFAULT_LANG']);
 
-        $('#aboutBody').html(Service.about()).append("</br><strong>Current trainer author: </strong>" + config['TRAINER_AUTHOR']);
+        $('#aboutBody').html(Service.about()).append("</br><strong>Current trainer author: </strong>" + (config['TRAINER_AUTHOR'] ? config['TRAINER_AUTHOR'] : 'Unknown') + "</br><strong>Course author: </strong>" + (config['COURSE_AUTHOR'] ? config['COURSE_AUTHOR'] : 'Unknown'));
 
         Cogwheel.setText('Loading language file');
         I18N.loadLanguage(function () {
@@ -661,7 +661,7 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '3.15';
+            var trainerVersion = '3.40';
             var trainerSetting = null;
             var reportUrl;
             var help_canvas;
@@ -809,9 +809,13 @@ var ScriptInvoker;
              * @param callback func i'll call when transferring is done
              */
             this.pushResultsEarly = function (callback) {
+                Cogwheel.setText("Ending trainer");
+                $('button#closeButton').click();
+                Cogwheel.show();
                 Scorer.end();
                 is_passed = 0;
                 pushResults();
+                Cogwheel.setText("Trainer ended!");
             };
 
             /**
@@ -819,7 +823,7 @@ var ScriptInvoker;
              * @param callback func i'll call when transferring is done
              */
             this.getHelpModal = function (callback) {
-                Cogwheel.setText("Sending screen shot");
+                Cogwheel.setText("Sending screenshot");
                 Cogwheel.show();
                 Scorer.end();
                 var helper = $('input#helpInput').val();
@@ -1447,22 +1451,6 @@ function Element() {
         this.classes = [];
         return this;
     };
-
-    $.fn.resizeText = function (options) {
-        var fontSize = options.maxFontPixels;
-        var ourText = $('span:visible:first', this);
-        var maxHeight = $(this).height();
-        var maxWidth = $(this).width();
-        var textHeight;
-        var textWidth;
-        do {
-            ourText.css('font-size', fontSize);
-            textHeight = ourText.height();
-            textWidth = ourText.width();
-            fontSize = fontSize - 1;
-        } while ((textHeight > maxHeight || textWidth > maxWidth) && fontSize > 3);
-        return this;
-    }
 }
 var Select = null;
 var CheckBox = null;
@@ -1504,12 +1492,11 @@ var LateX = null;
             if (!this.getName() || !this.getValue())
                 throw new NoArgumentException('Check name and value of element');
             this.removeClass('form-control');
-            var result = '<div class="radios" for="' + this.getName() + '">\n';
-            result += '<label id="radios">\n';
-            result += '<input type="radio"' + this.getParams() + 'values="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
+            var result = '<label id="radios">\n';
+            result += '<input type="radio"' + this.getParams() + 'value="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
             result += '\n<span class="radio-text">';
             result += this.getLabel();
-            result += '</span></label></div>';
+            result += '</span></label>';
 
             if (_Templatetor.templatable(result))
                 result = new _Templatetor().setTemplate(result).render();
@@ -1567,7 +1554,7 @@ var LateX = null;
             this.render = function () {
                 if (options.length == 0)
                     throw new NoArgumentException('Nothing to render. Please add at least one radio.');
-                var result = '<div class="form-group" for="' + this.getName() + '">\n';
+                var result = '<div class="radios form-group" for="' + this.getName() + '">\n';
                 for (var i = 0; i < options.length; i++)
                     result += options[i].render();
                 result += '</div>\n';
@@ -2096,6 +2083,8 @@ var Rotator = null;
             var nextButton = null;
             var prevButton = null;
 
+            var breadCrumb = null;
+
             /**
              * Ties up an wrapped DOM element of Prev Button
              * @param o {jQuery} wrapped DOM element of Prev Button
@@ -2339,6 +2328,7 @@ var Rotator = null;
                     throw new IllegalStateException('Step\'s settings haven\'t been loaded yet or is empty');
                 _Cogwheel.setText('Loading step').show();
                 getStepData(step, function (html) {
+
                     TEMPLATETOR.setTemplate(html);
                     getStepScript(step, function (mustache, scriptInstance) {
                         var data = TEMPLATETOR.extendView(mustache).render();
@@ -2363,6 +2353,7 @@ var Rotator = null;
             var fadeStepIn = function (id, callback) {
                 if (id >= settings.length)
                     throw new IllegalStateException('Step <' + id + '> is not loaded');
+                self.setBreadCrumbStepNames(id + 1);
                 changeBarProgress($('div.trainer-progress-bar div'), Rotator.getStepsCount(), id + 1);
                 var old = stepSpace.find('div[data-step="' + visibleStep + '"]');
                 if (old.is(':visible')) {
@@ -2446,10 +2437,30 @@ var Rotator = null;
                 var names = [];
                 var totalSteps = Object.keys(settings).length;
                 for (var i = 0; i < totalSteps; i++)
-                    namess.push(settings[i].filename);
+                    names.push(settings[i].filename);
                 return names;
             };
 
+            this.setBreadCrumb = function (b) {
+                if (typeof b !== 'object') throw new IllegalArgumentException("BreadCrumb should be an object!");
+                breadCrumb = b;
+            };
+            /**
+             * Sets a breadcrumb at top of page to display step names
+             */
+            this.setBreadCrumbStepNames = function (step) {
+                var result = '';
+                for (var i = 1; i <= stepsCount; i++) {
+                    if (step === i)
+                        result += '<li><a href="#">{{STEP' + i + '_NAME}}</a></li>';
+                    else {
+                        result += '<li>{{STEP' + i + '_NAME}}</li>';
+                    }
+                }
+                if (Tpl.templatable(result))
+                    result = new Tpl().setTemplate(result).render();
+                breadCrumb.html(result);
+            };
             /**
              * Performs transition to the next level
              * @param callback {function} callback to call after changing step
@@ -2735,8 +2746,23 @@ var Validator = null;
                     invalidTargets = 0;
                 for (var i = 0; i < targets.length; i++) {
                     var target = targets[i][0];
-                    var currentValue = (target.val() ? target.val() : target.attr("value")) + '';
-
+                    var currentValue = '';
+                    if (target.attr("type") === "radio") {
+                        target.parent().siblings().each(function () {
+                            var radioVal = $(this).find('input[type=radio]:checked').val();
+                            if (radioVal !== undefined) currentValue = radioVal;
+                        });
+                    }
+                    else if (target.attr("type") === "checkbox") {
+                        if (target.is(":checked")) {
+                            currentValue = 'true';
+                        } else {
+                            currentValue = 'false';
+                        }
+                    }
+                    else {
+                        currentValue = (target.val() ? target.val() : target.attr("value")) + '';
+                    }
                     currentValue = currentValue.replace(/,(\d+)$/, '.$1');
 
                     var correctValues = targets[i][1];
@@ -2772,8 +2798,10 @@ var Validator = null;
                     LOGGER.debug(target, target.prev());
                     if (isValid) {
                         LOGGER.debug('Target is good', target, 'target.val = ' + currentValue, 'correctValues:', correctValues);
-                        if (!dab)
+                        if (!dab) {
                             $('* [for="' + target.attr('name') + '"]').removeClass('has-error').addClass('has-success');
+                        }
+
                     } else {
                         LOGGER.debug('Target is wrong', target, 'target.val = ' + currentValue, 'correctValues:', correctValues);
                         if (!dab)

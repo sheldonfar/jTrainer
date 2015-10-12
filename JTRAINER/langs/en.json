@@ -56,6 +56,10 @@
 		
 		"POINTS1": "point",
 		"POINTS2": "point's",
-		"POINTS3": "point's"
+		"POINTS3": "point's",
+
+        "STEP1_NAME": "Intro",
+        "STEP2_NAME": "Elementstest",
+        "STEP3_NAME": "Result"
     }
 }
