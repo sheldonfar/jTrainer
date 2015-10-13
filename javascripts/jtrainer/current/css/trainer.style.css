@@ -181,7 +181,6 @@ img[name=langs] {
 
 .flag-icon {
     background-size: contain;
-    background: no-repeat 50%;
     position: relative;
     display: inline-block;
     line-height: 1em;
