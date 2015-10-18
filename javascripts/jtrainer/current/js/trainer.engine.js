@@ -661,11 +661,12 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '3.40';
+            var trainerVersion = '3.45';
             var trainerSetting = null;
             var reportUrl;
             var help_canvas;
             var is_passed = 1;
+            var self = this;
 
             /**
              * Sets trainer's config file path
@@ -780,22 +781,28 @@ var ScriptInvoker;
 
             /**
              * Pushes user's results to SSU server
+             * @param options additional options to add to userResult variable
              * @param callback func i'll call when transferring is done
              */
-            this.pushResults = function (callback) {
+            this.pushResults = function (options, callback) {
                 if (!reportUrl)
                     throw new IllegalStateException('Server is not notified yet');
 
                 var uScore = _Scorer.getScore().toFixed(0);
                 var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
 
-                $.post(reportUrl, {
-                    total_points: _Scorer.getTotalScore(),
-                    user_points: uScore,
+
+                var userResult = {
+                    total_points: 100,
+                    user_points: uScoreInPercent,
                     is_done: 1,
                     is_passed: is_passed,
-                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-                }).done(function (data) {
+                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScoreInPercent + "%" : "NO - " + uScoreInPercent + "%"
+                };
+                for(var key in options) {
+                    userResult[key] = options[key];
+                }
+                $.post(reportUrl, userResult).done(function (data) {
                     LOGGER.debug("RESULT: " + data);
                     if (typeof callback === "function")
                         callback(data);
@@ -814,7 +821,7 @@ var ScriptInvoker;
                 Cogwheel.show();
                 Scorer.end();
                 is_passed = 0;
-                pushResults();
+                self.pushResults();
                 Cogwheel.setText("Trainer ended!");
             };
 
@@ -832,27 +839,14 @@ var ScriptInvoker;
                     help_canvas = getCanvas();
                 }, 1000);
 
-                if (!reportUrl)
-                    throw new IllegalStateException('Server is not notified yet');
-
-                var uScore = _Scorer.getScore().toFixed(0);
-                var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-                $.post(reportUrl, {
-                    total_points: _Scorer.getTotalScore(),
-                    user_points: uScore,
-                    is_done: 1,
-                    is_passed: 0,
+                var options = {
                     help_image: help_canvas,
                     help_text: helper,
-                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-                }).done(function (data) {
-                    LOGGER.debug("RESULT: " + data);
-                    if (typeof callback === "function")
-                        callback(data);
-                }).fail(function (jqxhr, settings, exception) {
-                    throw new IllegalAsyncStateException(exception);
-                });
-                Cogwheel.hide();
+                    is_done: 1,
+                    is_passed: 0
+                };
+                self.pushResults(options);
+                Cogwheel.setText("Help request send!");
             };
 
 
@@ -869,27 +863,14 @@ var ScriptInvoker;
                     help_canvas = getCanvas();
                 }, 1000);
 
-                if (!reportUrl)
-                    throw new IllegalStateException('Server is not notified yet');
-
-                var uScore = _Scorer.getScore().toFixed(0);
-                var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-                $.post(reportUrl, {
-                    total_points: _Scorer.getTotalScore(),
-                    user_points: uScore,
-                    is_done: 1,
-                    is_passed: 0,
+                var options = {
                     help_image: help_canvas,
                     help_text: helper,
-                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-                }).done(function (data) {
-                    LOGGER.debug("RESULT: " + data);
-                    if (typeof callback === "function")
-                        callback(data);
-                }).fail(function (jqxhr, settings, exception) {
-                    throw new IllegalAsyncStateException(exception);
-                });
-                Cogwheel.hide();
+                    is_done: 1,
+                    is_passed: 0
+                };
+                self.pushResults(options);
+                Cogwheel.setText("Help request send!");
             };
 
             /**
