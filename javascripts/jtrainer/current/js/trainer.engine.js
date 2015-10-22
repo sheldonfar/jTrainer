@@ -661,10 +661,9 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '3.45';
+            var trainerVersion = '3.50';
             var trainerSetting = null;
             var reportUrl;
-            var help_canvas;
             var is_passed = 1;
             var self = this;
 
@@ -823,6 +822,7 @@ var ScriptInvoker;
                 is_passed = 0;
                 self.pushResults();
                 Cogwheel.setText("Trainer ended!");
+                Cogwheel.hideWithDelay(5000);
             };
 
             /**
@@ -836,17 +836,20 @@ var ScriptInvoker;
                 var helper = $('input#helpInput').val();
                 $('button#closeButton').click();
                 window.setTimeout(function () {
-                    help_canvas = getCanvas();
+                    html2canvas(document.body, {
+                        onrendered: function (canvas) {
+                            var options = {
+                                help_image: canvas.toDataURL(),
+                                help_text: helper,
+                                is_done: 1,
+                                is_passed: 0
+                            };
+                            self.pushResults(options);
+                            Cogwheel.setText("Help request sent!");
+                            Cogwheel.hideWithDelay(5000);
+                        }
+                    });
                 }, 1000);
-
-                var options = {
-                    help_image: help_canvas,
-                    help_text: helper,
-                    is_done: 1,
-                    is_passed: 0
-                };
-                self.pushResults(options);
-                Cogwheel.setText("Help request send!");
             };
 
 
@@ -860,43 +863,21 @@ var ScriptInvoker;
                 Scorer.end();
                 var helper = prompt("Please enter help message text:");
                 window.setTimeout(function () {
-                    help_canvas = getCanvas();
+                    html2canvas(document.body, {
+                        onrendered: function (canvas) {
+                            var options = {
+                                help_image: canvas.toDataURL(),
+                                help_text: helper,
+                                is_done: 1,
+                                is_passed: 0
+                            };
+                            self.pushResults(options);
+                            Cogwheel.setText("Help request sent!");
+                            Cogwheel.hideWithDelay(5000);
+                        }
+                    });
                 }, 1000);
-
-                var options = {
-                    help_image: help_canvas,
-                    help_text: helper,
-                    is_done: 1,
-                    is_passed: 0
-                };
-                self.pushResults(options);
-                Cogwheel.setText("Help request send!");
             };
-
-            /**
-             * Render's document body into a canvas
-             * @returns Canvas toDataURL
-             */
-            var getCanvas = function () {
-                html2canvas(document.body, {
-                    onrendered: function (canvas) {
-                        help_canvas = canvas.toDataURL();
-                    }
-                });
-                return help_canvas;
-            };
-
-            /**
-             * Get a string of whats inside an object
-             * @returns String of object contents
-             */
-            this.varDump = function (obj) {
-                var out = '';
-                for (var i in obj) {
-                    out += i + ": " + obj[i] + "\n";
-                }
-                return out;
-            }
         });
 })(jQuery, Scorer, Logger);
 
@@ -2031,6 +2012,22 @@ var Cogwheel = new
             if (!cogwheelElement)
                 throw new IllegalStateException('Set cogwheel $ object first!');
             cogwheelElement.modal('hide');
+            return this;
+        };
+
+        /**
+         * Hides a loading splash with delay
+         * @param delay to wait until hiding
+         * @returns {Cogwheel} current object (flow)
+         */
+        this.hideWithDelay = function (delay) {
+            if (!cogwheelElement)
+                throw new IllegalStateException('Set cogwheel $ object first!');
+            if (typeof delay !== "number")
+                throw new IllegalStateException('Delay value should be a number!');
+            window.setTimeout(function() {
+                cogwheelElement.modal('hide');
+            }, delay);
             return this;
         };
     });
