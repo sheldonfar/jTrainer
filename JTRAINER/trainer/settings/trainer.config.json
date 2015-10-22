@@ -6,5 +6,7 @@
     },
     "DEFAULT_LANG": "ru",
     "TRAINER_SCORE": 30,
+    "TRAINER_AUTHOR": "Yevhenii Minin",
+    "COURSE_AUTHOR": "Ivan Ivanov",
     "PRODUCTION": false
 }

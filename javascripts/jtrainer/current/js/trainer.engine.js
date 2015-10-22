@@ -1,9 +1,9 @@
 //-------------------------INIT PART-----------------------------------------------------
 $(document).ready(function () {
     Cogwheel.setCogWheelElement($('#cogwheel-modal'))
-            .setCogWheelDescElement($('#cogwheel-desc'))
-            .setText('Init started')
-            .show();
+        .setCogWheelDescElement($('#cogwheel-desc'))
+        .setText('Init started')
+        .show();
 
     Cogwheel.setText('Loading trainer settings');
     Service.loadConfig(function () {
@@ -12,16 +12,16 @@ $(document).ready(function () {
 
         if (PRODUCTION === true) {
             Logger.production();
-        } else{
+        } else {
             $.ajaxSetup({cache: false});
             Logger.debugging();
         }
-
+        Rotator.setBreadCrumb($('.bc-steps'));
         Cogwheel.setText('Setting up step rotator');
         Rotator.setStepSpace($('section.stepspace'));
         Rotator.setNextButton($('#nextController'))
-               .setPrevButton($('#prevController'))
-               .enableNextButton();
+            .setPrevButton($('#prevController'))
+            .enableNextButton();
 
         Cogwheel.setText('Setting up i18n');
         I18N.setAvailableLanguages(config['LANGUAGES']);
@@ -30,6 +30,8 @@ $(document).ready(function () {
             I18N.setLanguage(langParam);
         else
             I18N.setLanguage(config['DEFAULT_LANG']);
+
+        $('#aboutBody').html(Service.about()).append("</br><strong>Current trainer author: </strong>" + (config['TRAINER_AUTHOR'] ? config['TRAINER_AUTHOR'] : 'Unknown') + "</br><strong>Course author: </strong>" + (config['COURSE_AUTHOR'] ? config['COURSE_AUTHOR'] : 'Unknown'));
 
         Cogwheel.setText('Loading language file');
         I18N.loadLanguage(function () {
@@ -46,7 +48,7 @@ $(document).ready(function () {
                 if (!PRODUCTION)
                     Cogwheel.hide();
                 else {
-                    Service.notifyServer(function() {
+                    Service.notifyServer(function () {
                         Cogwheel.hide();
                     })
                 }
@@ -54,9 +56,6 @@ $(document).ready(function () {
         });
     });
 });
-
-
-
 
 
 //---------------------------------LOGGER PART-----------------------------------------------------
@@ -168,24 +167,21 @@ function Logger() {
         if (Logger.level <= 2)
             consoleLog(arguments, _error);
     };
-};
+}
 Logger.level = 0;
 
 Logger.debugging = function () {
     Logger.level = 0
-}
+};
 Logger.informer = function () {
     Logger.level = 1;
-}
+};
 Logger.production = function () {
     Logger.level = 2;
-}
+};
 Logger.silent = function () {
     Logger.level = 3;
-}
-
-
-
+};
 
 
 //---------------------------------TEMPLATETOR PART-----------------------------------------------------
@@ -365,15 +361,12 @@ Templatetor.constructor.prototype.templatable = function (t) {
 };
 
 
-
-
-
 //------------------------------SCORER PART-----------------------------------------------------
 var Scorer = new
     (function () {
         var score;
-		var userStepScores = [];
-		
+        var userStepScores = [];
+
         var startTime;
         var endTime;
         var diffTime;
@@ -405,10 +398,10 @@ var Scorer = new
             else if (s > totalScore)
                 throw new IllegalStateException("Illegal adding");
             score += s;
-			this.addUserStepScores(s);
+            this.addUserStepScores(s);
         };
-		
-		 /**
+
+        /**
          * Adds points to user's global score
          * @param s {Number} amount of points
          */
@@ -417,7 +410,7 @@ var Scorer = new
                 throw new IllegalStateException("Start scorer first!");
             else if (s > totalScore)
                 throw new IllegalStateException("Illegal adding");
-			userStepScores.push(s);
+            userStepScores.push(s);
         };
 
 
@@ -460,18 +453,18 @@ var Scorer = new
                 throw new IllegalStateException("Finish scorer first!");
             return score;
         };
-		
-		/**
+
+        /**
          * Gets a total users score in percent
-         * @returns {Number} user's total score or false, if monitoring is not finished yet.
+         * @returns {string} user's total score or false, if monitoring is not finished yet.
          */
         this.getScoreInPercent = function () {
             if (!endTime)
                 throw new IllegalStateException("Finish scorer first!");
             return (score / totalScore * 100).toFixed(0);
         };
-		
-		/**
+
+        /**
          * Gets an array of users scores
          * @returns {Array} of user's step scores or false, if monitoring is not finished yet.
          */
@@ -480,7 +473,7 @@ var Scorer = new
                 throw new IllegalStateException("Finish scorer first!");
             return userStepScores;
         };
-		
+
         /**
          * Gets a trainer's score
          * @returns {Number} user's total score or false, if monitoring is not finished yet.
@@ -501,11 +494,7 @@ var Scorer = new
             totalScore = s;
         }
     });
-	
-	
-	
-	
-	
+
 
 //-----------------------------------I18N PART-----------------------------------------------------
 var I18N = null;
@@ -577,6 +566,7 @@ var I18N = null;
              * @param callback {function} a callback, that will be called after a successful download
              */
             this.loadLanguage = function (callback) {
+                //noinspection JSUnresolvedFunction
                 $.ajax({
                     url: LANG_PATH + currentLangCode + '.json',
                     dataType: "JSON"
@@ -620,42 +610,42 @@ var I18N = null;
             this.getCurrentLang = function () {
                 return currentLangCode;
             };
-			
-			/**
-			 * Returns correct word ending using cases
-			 * @param  iNumber Integer Number used to make ending
-			 * @param  aEndings Array Array of words or endings for numbers (1, 4, 5),
-			 *         e.g. ['яблоко', 'яблока', 'яблок']
-			 * @returns String
-			 */
-			getNumEnding = function(iNumber, aEndings) {
-				var sEnding, i;
-				iNumber = iNumber % 100;
-				if (iNumber>=11 && iNumber<=19) {
-					sEnding=aEndings[2];
-				}
-				else {
-					i = iNumber % 10;
-					switch (i)
-					{
-						case (1): sEnding = aEndings[0]; break;
-						case (2):
-						case (3):
-						case (4): sEnding = aEndings[1]; break;
-						default: sEnding = aEndings[2];
-					}
-				}
-				if (_Templatetor.templatable(sEnding))
+
+            /**
+             * Returns correct word ending using cases
+             * @param  iNumber Integer Number used to make ending
+             * @param  aEndings Array Array of words or endings for numbers (1, 4, 5),
+             *         e.g. ['яблоко', 'яблока', 'яблок']
+             * @returns String
+             */
+            getNumEnding = function (iNumber, aEndings) {
+                var sEnding, i;
+                iNumber = iNumber % 100;
+                if (iNumber >= 11 && iNumber <= 19) {
+                    sEnding = aEndings[2];
+                }
+                else {
+                    i = iNumber % 10;
+                    switch (i) {
+                        case (1):
+                            sEnding = aEndings[0];
+                            break;
+                        case (2):
+                        case (3):
+                        case (4):
+                            sEnding = aEndings[1];
+                            break;
+                        default:
+                            sEnding = aEndings[2];
+                    }
+                }
+                if (_Templatetor.templatable(sEnding))
                     sEnding = new _Templatetor().setTemplate(sEnding).render();
-				return sEnding;
-			}
+                return sEnding;
+            }
 
         });
 })(jQuery, Logger, Templatetor);
-
-
-
-
 
 
 //---------------------------------SERVICE PART-----------------------------------------------------
@@ -671,11 +661,12 @@ var ScriptInvoker;
         (function () {
             var LOGGER = new _Logger();
             var CONFIG_FILE = 'trainer/settings/trainer.config.json';
-            var trainerVersion = '3.0';
+            var trainerVersion = '3.50';
             var trainerSetting = null;
             var reportUrl;
-			var help_canvas
-			
+            var is_passed = 1;
+            var self = this;
+
             /**
              * Sets trainer's config file path
              * @param p {String} path to trainer's config file
@@ -704,12 +695,12 @@ var ScriptInvoker;
                     url: CONFIG_FILE,
                     dataType: "JSON"
                 }).done(function (data) {
-                        trainerSetting = data;
-                        if (typeof(callback) === "function")
-                            callback();
-                    }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                    trainerSetting = data;
+                    if (typeof(callback) === "function")
+                        callback();
+                }).fail(function (jqxhr, settings, exception) {
+                    throw new IllegalAsyncStateException(exception);
+                });
             };
 
             /**
@@ -718,7 +709,7 @@ var ScriptInvoker;
              * @returns {String} value of param
              */
             this.getUrlParam = function (name) {
-				name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
                 var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                     results = regex.exec(window.location.search);
                 return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
@@ -730,7 +721,7 @@ var ScriptInvoker;
              * @param callback func
              */
             this.appendScript = function (url, callback) {
-                var script = document.createElement("script")
+                var script = document.createElement("script");
                 script.type = "text/javascript";
                 if (script.readyState) {  //IE
                     script.onreadystatechange = function () {
@@ -747,13 +738,14 @@ var ScriptInvoker;
                 }
                 script.src = url;
                 document.getElementsByTagName("head")[0].appendChild(script);
-            }
+            };
 
             /**
-             * About trainer alert
+             * About trainer
+             * @returns string with info about jTrainer
              */
             this.about = function () {
-                alert('jTrainer v' + trainerVersion + '\nSumDU Distance Learning E-Trainer\nAuthors: Ilia Ovchinnikov & Evgeniy Minin');
+                return '<h4>jTrainer v' + trainerVersion + '\nSumDU Distance Learning E-Trainer</h4>\n<br><strong>Framework authors</strong>: Ilia Ovchinnikov & Yevhenii Minin';
             };
 
             /**
@@ -788,116 +780,104 @@ var ScriptInvoker;
 
             /**
              * Pushes user's results to SSU server
+             * @param options additional options to add to userResult variable
              * @param callback func i'll call when transferring is done
              */
-            this.pushResults = function (callback) {
+            this.pushResults = function (options, callback) {
                 if (!reportUrl)
                     throw new IllegalStateException('Server is not notified yet');
 
                 var uScore = _Scorer.getScore().toFixed(0);
                 var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-                
-                $.post(reportUrl, {
-                    total_points: _Scorer.getTotalScore(),
-                    user_points: uScore,
+
+
+                var userResult = {
+                    total_points: 100,
+                    user_points: uScoreInPercent,
                     is_done: 1,
-                    is_passed: 1,
-                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-                }).done(function (data) {
-                        LOGGER.debug("RESULT: " + data);
-                        if (typeof callback === "function")
-                            callback(data);
-                    }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
+                    is_passed: is_passed,
+                    user_reply: uScoreInPercent >= 60 ? "YES - " + uScoreInPercent + "%" : "NO - " + uScoreInPercent + "%"
+                };
+                for(var key in options) {
+                    userResult[key] = options[key];
+                }
+                $.post(reportUrl, userResult).done(function (data) {
+                    LOGGER.debug("RESULT: " + data);
+                    if (typeof callback === "function")
+                        callback(data);
+                }).fail(function (jqxhr, settings, exception) {
+                    throw new IllegalAsyncStateException(exception);
+                });
+            };
+
+            /**
+             * Pushes user's results to SSU server
+             * @param callback func i'll call when transferring is done
+             */
+            this.pushResultsEarly = function (callback) {
+                Cogwheel.setText("Ending trainer");
+                $('button#closeButton').click();
+                Cogwheel.show();
+                Scorer.end();
+                is_passed = 0;
+                self.pushResults();
+                Cogwheel.setText("Trainer ended!");
+                Cogwheel.hideWithDelay(5000);
+            };
+
+            /**
+             * Get's help from SSU server
+             * @param callback func i'll call when transferring is done
+             */
+            this.getHelpModal = function (callback) {
+                Cogwheel.setText("Sending screenshot");
+                Cogwheel.show();
+                Scorer.end();
+                var helper = $('input#helpInput').val();
+                $('button#closeButton').click();
+                window.setTimeout(function () {
+                    html2canvas(document.body, {
+                        onrendered: function (canvas) {
+                            var options = {
+                                help_image: canvas.toDataURL(),
+                                help_text: helper,
+                                is_done: 1,
+                                is_passed: 0
+                            };
+                            self.pushResults(options);
+                            Cogwheel.setText("Help request sent!");
+                            Cogwheel.hideWithDelay(5000);
+                        }
                     });
+                }, 1000);
             };
-			
-			/**
+
+
+            /**
+             * CAREFUL THIS IS LEFT FOR COMPATIBILITY WITH OLDER VERSIONS - DO NOT USE ANYMORE
              * Get's help from SSU server
              * @param callback func i'll call when transferring is done
              */
-			this.getHelpModal = function (callback) {
-				Cogwheel.setText("Sending screenshot");
-				Cogwheel.show();
-				Scorer.end();
-				var helper = $('input#helpInput').val();
-				$('button#closeButton').click();
-				window.setTimeout(function() {
-					help_canvas = getCanvas();
-				}, 1000);
-				
-				if (!reportUrl)
-					throw new IllegalStateException('Server is not notified yet');
-						
-				var uScore = _Scorer.getScore().toFixed(0);
-				var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-				$.post(reportUrl, {
-					total_points: _Scorer.getTotalScore(),
-					user_points: uScore,
-					is_done: 1,
-					is_passed: 0,
-					help_image: help_canvas,
-					help_text: helper,
-					user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-				}).done(function (data) {
-						LOGGER.debug("RESULT: " + data);
-						if (typeof callback === "function")
-							callback(data);
-					}).fail(function (jqxhr, settings, exception) {
-						throw new IllegalAsyncStateException(exception);
-					});			
-				Cogwheel.hide();
+            this.getHelp = function (callback) {
+                Cogwheel.show();
+                Scorer.end();
+                var helper = prompt("Please enter help message text:");
+                window.setTimeout(function () {
+                    html2canvas(document.body, {
+                        onrendered: function (canvas) {
+                            var options = {
+                                help_image: canvas.toDataURL(),
+                                help_text: helper,
+                                is_done: 1,
+                                is_passed: 0
+                            };
+                            self.pushResults(options);
+                            Cogwheel.setText("Help request sent!");
+                            Cogwheel.hideWithDelay(5000);
+                        }
+                    });
+                }, 1000);
             };
-			
-			
-			/**
-			 * CAREFUL THIS IS LEFT FOR COMPATIBILITY WITH OLDER VERSIONS - DO NOT USE ANYMORE
-             * Get's help from SSU server
-             * @param callback func i'll call when transferring is done
-             */
-			this.getHelp = function (callback) {
-				Cogwheel.show();
-				Scorer.end();
-				var helper = prompt("Please enter help message text:")
-				window.setTimeout(function() {
-					help_canvas = getCanvas();
-				}, 1000);
-				
-				if (!reportUrl)
-					throw new IllegalStateException('Server is not notified yet');
-						
-				var uScore = _Scorer.getScore().toFixed(0);
-				var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-				$.post(reportUrl, {
-					total_points: _Scorer.getTotalScore(),
-					user_points: uScore,
-					is_done: 1,
-					is_passed: 0,
-					help_image: help_canvas,
-					help_text: helper,
-					user_reply: uScoreInPercent >= 60 ? "YES - " + uScore : "NO - " + uScore
-				}).done(function (data) {
-						LOGGER.debug("RESULT: " + data);
-						if (typeof callback === "function")
-							callback(data);
-					}).fail(function (jqxhr, settings, exception) {
-						throw new IllegalAsyncStateException(exception);
-					});			
-				Cogwheel.hide();
-            };
-			
-			/**
-             * Render's document body into a canvas
-             * @returns Canvas toDataURL
-             */
-			var getCanvas = function() {
-				html2canvas(document.body, {
-					onrendered: function(canvas) {
-						help_canvas = canvas.toDataURL();
-					}
-				});
-				return help_canvas;
-			};
         });
 })(jQuery, Scorer, Logger);
 
@@ -920,7 +900,7 @@ var ScriptInvoker;
          * @param b auto clean if true, otherwise saves stack values
          * @returns {ScriptInvoker} current object (flow)
          */
-        this.autoClean = function(b) {
+        this.autoClean = function (b) {
             clean = !!b;
             return this;
         };
@@ -1020,7 +1000,7 @@ var ScriptInvoker;
          * Clears sources and commands stacks
          * @returns {ScriptInvoker} current object (flow)
          */
-        this.clear = function() {
+        this.clear = function () {
             sources.length = 0;
             commands.length = 0;
             return this;
@@ -1083,17 +1063,13 @@ function IllegalAsyncStateException(message) {
 }
 
 
-
-
-
-
 //------------------------------COLLECTIONS PART-----------------------------------------------------
-String.prototype.escapeHTML = function(){
+String.prototype.escapeHTML = function () {
     return document.createElement('div')
         .appendChild(document.createTextNode(this))
         .parentNode
         .innerHTML
-}
+};
 
 var Map = function () {
     var db = [];
@@ -1197,7 +1173,7 @@ var Map = function () {
     /**
      * Map's iterator. For each map's key-value pair calls callback
      * with (key, value) params
-     * @param callback {function} funct to call
+     * @param callback {function} function to call
      * @returns {boolean} true, if there are elements in map, otherwise false
      */
     this.iterate = function (callback) {
@@ -1240,8 +1216,6 @@ var Map = function () {
         return this;
     };
 };
-
-
 
 
 //--------------------------------ELEMENTS PART-----------------------------------------------------
@@ -1312,7 +1286,7 @@ function Element() {
      */
     this.getValue = function () {
         if (this.value) {
-          return this.value.toString();
+            return this.value.toString();
         }
         return this.value;
     };
@@ -1364,7 +1338,7 @@ function Element() {
             (this.getClasses().length > 0 ? 'class="' + this.getClasses().join(' ') + '"' : '') +
             (this.getStyle() ? 'style="' + this.getStyle() + '" ' : '') + ' ';
 
-    }
+    };
     /**
      * Renders the element
      * SHOULD BE OVERRIDDEN
@@ -1373,7 +1347,7 @@ function Element() {
     this.render = function () {
         if (!this.getName() || !this.getValue())
             throw new NoArgumentException('Check name and value of element');
-        return '<element><!-- Here should your element goes --></element>';
+        return '<!-- Your element should go here -->';
     };
 
     /**
@@ -1425,7 +1399,7 @@ function Element() {
      * @returns {Element} current object {flow)
     */
     this.removeClass = function (c) {
-        this.classes = $.grep(this.classes, function(value) {
+        this.classes = $.grep(this.classes, function (value) {
             return value != c;
         });
         return this;
@@ -1438,23 +1412,7 @@ function Element() {
     this.clearClasses = function () {
         this.classes = [];
         return this;
-    }
-
-	$.fn.resizeText = function(options) {
-		var fontSize = options.maxFontPixels;
-		var ourText = $('span:visible:first', this);
-		var maxHeight = $(this).height();
-		var maxWidth = $(this).width();
-		var textHeight;
-		var textWidth;
-		do {
-			ourText.css('font-size', fontSize);
-			textHeight = ourText.height();
-			textWidth = ourText.width();
-			fontSize = fontSize - 1;
-		} while ((textHeight > maxHeight || textWidth > maxWidth) && fontSize > 3);
-		return this;
-	}
+    };
 }
 var Select = null;
 var CheckBox = null;
@@ -1487,7 +1445,7 @@ var LateX = null;
             checked = b;
             return this;
         };
-		
+
         /**
          * Renders the element
          * @returns {String} rendered element
@@ -1495,16 +1453,15 @@ var LateX = null;
         this.render = function () {
             if (!this.getName() || !this.getValue())
                 throw new NoArgumentException('Check name and value of element');
-			this.removeClass('form-control');
-            var result = '<div class="radios" for="' + this.getName() + '">\n';
-            result += '<label id="radios">\n';
-            result += '<input type="radio"' + this.getParams() + 'values="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
+            this.removeClass('form-control');
+            var result = '<label id="radios">\n';
+            result += '<input type="radio"' + this.getParams() + 'value="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
             result += '\n<span class="radio-text">';
-			result += this.getLabel();
-            result += '</span></label></div>';
-	
+            result += this.getLabel();
+            result += '</span></label>';
+
             if (_Templatetor.templatable(result))
-                    result = new _Templatetor().setTemplate(result).render();
+                result = new _Templatetor().setTemplate(result).render();
             return result;
         };
     };
@@ -1516,21 +1473,21 @@ var LateX = null;
             if (typeof n === "string")
                 this.setName(n);
             var options = [];
-			
-			/**
-			 * Scramble options inside radio group
-			 */
-			this.randomize = function() {
-				var currentIndex = options.length, temporaryValue, randomIndex;
-				while (0 !== currentIndex) {
-					randomIndex = Math.floor(Math.random() * currentIndex);
-					currentIndex -= 1;
-					temporaryValue = options[currentIndex];
-					options[currentIndex] = options[randomIndex];
-					options[randomIndex] = temporaryValue;
-				}
-				return this;
-			}
+
+            /**
+             * Scramble options inside radio group
+             */
+            this.randomize = function () {
+                var currentIndex = options.length, temporaryValue, randomIndex;
+                while (0 !== currentIndex) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+                    temporaryValue = options[currentIndex];
+                    options[currentIndex] = options[randomIndex];
+                    options[randomIndex] = temporaryValue;
+                }
+                return this;
+            };
             /**
              * Adds a radio to radio-group
              * @param label {String} text of option
@@ -1541,17 +1498,17 @@ var LateX = null;
             this.addRadio = function (label, value, checked) {
                 if (typeof value !== "string" && typeof value !== "number")
                     throw new IllegalArgumentException('Value should be a number of string');
-				else if (!this.getName())
+                else if (!this.getName())
                     throw new IllegalStateException('Specify name of the radio-group first!');
-				this.setLabel(label);
-				this.setValue(value);
-				var radio = new Radio(this.getName()).setValue(this.getValue()).checked(!!checked);
+                this.setLabel(label);
+                this.setValue(value);
+                var radio = new Radio(this.getName()).setValue(this.getValue()).checked(!!checked);
                 if (this.getLabel())
                     radio.setLabel(this.getLabel());
                 options.push(radio);
                 return this;
             };
-			
+
             /**
              * Renders the element
              * @returns {String} rendered element
@@ -1559,7 +1516,7 @@ var LateX = null;
             this.render = function () {
                 if (options.length == 0)
                     throw new NoArgumentException('Nothing to render. Please add at least one radio.');
-                var result = '<div class="form-group" for="' + this.getName() + '">\n';
+                var result = '<div class="radios form-group" for="' + this.getName() + '">\n';
                 for (var i = 0; i < options.length; i++)
                     result += options[i].render();
                 result += '</div>\n';
@@ -1573,7 +1530,7 @@ var LateX = null;
         function (n) {
             if (typeof n === "string")
                 this.setName(n);
-			
+
 
             /**
              * Renders the element
@@ -1582,7 +1539,7 @@ var LateX = null;
             this.render = function () {
                 if (!this.getName())
                     throw new NoArgumentException('Please check element\'s name.');
-				this.removeClass('form-control');
+                this.removeClass('form-control');
                 var result = '<div class="form-group" for="' + this.getName() + '">\n';
                 result += '<div class="checkbox">\n';
                 result += '<label>\n';
@@ -1608,22 +1565,22 @@ var LateX = null;
             if (typeof n === "string")
                 this.setName(n);
             var options = [];
-			
-			/**
-			 * Scramble options inside select group
-			 */
-			this.randomize = function() {
-				var currentIndex = options.length, temporaryValue, randomIndex;
-				while (0 !== currentIndex) {
-					randomIndex = Math.floor(Math.random() * currentIndex);
-					currentIndex -= 1;
-					temporaryValue = options[currentIndex];
-					options[currentIndex] = options[randomIndex];
-					options[randomIndex] = temporaryValue;
-				}
-				return this;
-			}
-			
+
+            /**
+             * Scramble options inside select group
+             */
+            this.randomize = function () {
+                var currentIndex = options.length, temporaryValue, randomIndex;
+                while (0 !== currentIndex) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+                    temporaryValue = options[currentIndex];
+                    options[currentIndex] = options[randomIndex];
+                    options[randomIndex] = temporaryValue;
+                }
+                return this;
+            };
+
             /**
              * Adds an option tag to element
              * @param label {String} text of element
@@ -1675,7 +1632,7 @@ var LateX = null;
         };
     Select.prototype = new Element();
     Select.prototype.constructor = Select;
-	
+
     /**
      * This class in a wrapper to html text input.
      * @param n {String} input's name
@@ -1736,7 +1693,7 @@ var LateX = null;
      */
     TextArea =
         function (n) {
-            TextInput.call(this, n)
+            TextInput.call(this, n);
 
             var placeholder = '{{ENTER_TEXT}}';
 
@@ -1745,10 +1702,10 @@ var LateX = null;
                     throw new Error('Please check element\'s name. It\'s empty.');
                 var result = '<div class="form-group" for="' + this.getName() + '">\n';
                 result += '<textarea' + this.getParams() + ' placeholder="' + placeholder + '">';
-                if (this.value){
-                  result += this.value.toString().escapeHTML();
+                if (this.value) {
+                    result += this.value.toString().escapeHTML();
                 }
-                result +='</textarea>\n';
+                result += '</textarea>\n';
                 result += '</div>\n';
                 if (_Templatetor.templatable(result))
                     result = new _Templatetor().setTemplate(result).render();
@@ -1789,21 +1746,21 @@ var LateX = null;
             if (typeof n === "string")
                 this.setName(n);
             var options = [];
-			
-			/**
-			 * Scramble options inside Draggable group
-			 */
-			this.randomize = function() {
-				var currentIndex = options.length, temporaryValue, randomIndex;
-				while (0 !== currentIndex) {
-					randomIndex = Math.floor(Math.random() * currentIndex);
-					currentIndex -= 1;
-					temporaryValue = options[currentIndex];
-					options[currentIndex] = options[randomIndex];
-					options[randomIndex] = temporaryValue;
-				}
-				return this;
-			}
+
+            /**
+             * Scramble options inside Draggable group
+             */
+            this.randomize = function () {
+                var currentIndex = options.length, temporaryValue, randomIndex;
+                while (0 !== currentIndex) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex -= 1;
+                    temporaryValue = options[currentIndex];
+                    options[currentIndex] = options[randomIndex];
+                    options[randomIndex] = temporaryValue;
+                }
+                return this;
+            };
 
             this.addOption = function (label, value) {
                 if (!label || !value)
@@ -1896,68 +1853,68 @@ var LateX = null;
                 }
             };
         };
-	
-	/**
+
+    /**
      * This class is a wrapper to WolframAlpha API.
      * @constructor
      */
     GoogleCharts =
         function () {
-            var query;
-			var chartType;
-			var chartData;
-			var chartOptions;
-			var chartLibrary;
-			
-			this.setType = function (type) {
-				if (typeof type !== "string")
+            var chartType;
+            var chartData;
+            var chartOptions;
+            var chartLibrary;
+
+            this.setType = function (type) {
+                if (typeof type !== "string")
                     throw new IllegalArgumentException("chartType should be a string");
-				chartType = type;
-			};
-			
-			this.setData = function (data) {
-				if(!Array.isArray(data))
-					throw new IllegalArgumentException("chartData should be an array!");
-				chartData = data;
-			};
-			
-			this.setOptions = function (options) {
-				if(typeof options !== 'object')
-					throw new IllegalArgumentException("chartOptions should be an json object!");
-				chartOptions = options;
-			};
-			
-			this.setLibrary = function (library) {
-				if (typeof library !== "string")
+                chartType = type;
+            };
+
+            this.setData = function (data) {
+                if (!Array.isArray(data))
+                    throw new IllegalArgumentException("chartData should be an array!");
+                chartData = data;
+            };
+
+            this.setOptions = function (options) {
+                if (typeof options !== 'object')
+                    throw new IllegalArgumentException("chartOptions should be an json object!");
+                chartOptions = options;
+            };
+
+            this.setLibrary = function (library) {
+                if (typeof library !== "string")
                     throw new IllegalArgumentException("chartLibrary should be a string");
-				chartLibrary = library;
-			};
-			
+                chartLibrary = library;
+            };
+
             /**
              * Performs a query with WolframAlpha API through SumDU server
              * @param callback {function} callback to call after loading
              */
             this.doQuery = function (id) {
                 $.ajax({
-				  url: 'https://www.google.com/jsapi?callback',
-				  cache: true,
-				  dataType: 'script',
-				  success: function(){
-					google.load('visualization', '1.1', {packages:[chartType], 'callback' : function() {
-						var data = google.visualization.arrayToDataTable(chartData);
-									
-						var chart = eval("new " + chartLibrary + "(id[0])");
-						chart.draw(data, chartOptions);
-					}
-					});
-				  }
-				
-				}).fail(function() {
-					 throw new IllegalAsyncStateException("Problem with building a chart");
-				 });
+                    url: 'https://www.google.com/jsapi?callback',
+                    cache: true,
+                    dataType: 'script',
+                    success: function () {
+                        google.load('visualization', '1.1', {
+                            packages: [chartType], 'callback': function () {
+                                var data = google.visualization.arrayToDataTable(chartData);
+
+                                var chart = eval("new " + chartLibrary + "(id[0])");
+                                chart.draw(data, chartOptions);
+                            }
+                        });
+                    },
+                    error: function () {
+                        throw new IllegalAsyncStateException("Problem with building a chart");
+                    }
+                })
             };
         };
-		
+
     /**
      * Class for rendering LateX formulas
      * @constructor
@@ -1989,11 +1946,6 @@ var LateX = null;
             };
         };
 })(jQuery, Templatetor, StepInvoker);
-
-
-
-
-
 
 
 //-----------------------------COGWHEEL PART-----------------------------------------------------
@@ -2062,13 +2014,25 @@ var Cogwheel = new
             cogwheelElement.modal('hide');
             return this;
         };
+
+        /**
+         * Hides a loading splash with delay
+         * @param delay to wait until hiding
+         * @returns {Cogwheel} current object (flow)
+         */
+        this.hideWithDelay = function (delay) {
+            if (!cogwheelElement)
+                throw new IllegalStateException('Set cogwheel $ object first!');
+            if (typeof delay !== "number")
+                throw new IllegalStateException('Delay value should be a number!');
+            window.setTimeout(function() {
+                cogwheelElement.modal('hide');
+            }, delay);
+            return this;
+        };
     });
 
 
-	
-	
-	
-	
 //------------------------------------ROTATOR PART-----------------------------------------------------
 var Rotator = null;
 
@@ -2089,13 +2053,15 @@ var Rotator = null;
             var SETTINGS_PATH = STEP_PATH + 'settings/trainer.steps.json';
             var settings = null;
             var stepSpace = null;
-			var stepsCount = 0;
-			
+            var stepsCount = 0;
+
             var lastLoadedStep = 0;
             var visibleStep = 0;
 
             var nextButton = null;
             var prevButton = null;
+
+            var breadCrumb = null;
 
             /**
              * Ties up an wrapped DOM element of Prev Button
@@ -2222,8 +2188,8 @@ var Rotator = null;
                     throw new IllegalStateException('Step space is undefined');
                 stepSpace.append(data);
             };
-			
-			/**
+
+            /**
              * Gets a max score for next step
              * @param step {Number} step's index
              * @returns {Numeric} amount of points for this step
@@ -2234,7 +2200,7 @@ var Rotator = null;
                 else
                     throw new llegalStateException('stepsCount is not initialized');
             };
-			
+
             /**
              * Loads step's setting file
              * @param callback {function} callback to call after loading
@@ -2244,15 +2210,15 @@ var Rotator = null;
                     url: SETTINGS_PATH,
                     dataType: "JSON"
                 }).done(function (data) {
-                        LOGGER.info('Settings data loaded...');
-                        settings = data;
-						stepsCount = settings.length;
-                        LOGGER.debug(settings);
-                        if (typeof(callback) === "function")
-                            callback();
-                    }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                    LOGGER.info('Settings data loaded...');
+                    settings = data;
+                    stepsCount = settings.length;
+                    LOGGER.debug(settings);
+                    if (typeof(callback) === "function")
+                        callback();
+                }).fail(function (jqxhr, settings, exception) {
+                    throw new IllegalAsyncStateException(exception);
+                });
             };
 
             /**
@@ -2275,15 +2241,15 @@ var Rotator = null;
             var getStepScript = function (step, callback) {
                 var view = {};
                 if (!settings[step]['hasScript']) {
-                    LOGGER.info('Step <' + step + '> doesn\'t has own script');
+                    LOGGER.info('Step <' + step + '> doesn\'t have own script');
                     callback(view);
                     return;
                 }
                 $.getScript(SCRIPTS_PATH + settings[step]['filename'] + '.js')
                     .done(function (script) {
-						if(settings[step]['score'] === 0) {
-							_Scorer.addScore(0);
-						}
+                        if (settings[step]['score'] === 0) {
+                            _Scorer.addScore(0);
+                        }
                         LOGGER.info('Step\'s script loaded...');
                         var stepJSObject = window[settings[step]['filename']];
                         LOGGER.debug(stepJSObject);
@@ -2340,6 +2306,7 @@ var Rotator = null;
                     throw new IllegalStateException('Step\'s settings haven\'t been loaded yet or is empty');
                 _Cogwheel.setText('Loading step').show();
                 getStepData(step, function (html) {
+
                     TEMPLATETOR.setTemplate(html);
                     getStepScript(step, function (mustache, scriptInstance) {
                         var data = TEMPLATETOR.extendView(mustache).render();
@@ -2364,7 +2331,8 @@ var Rotator = null;
             var fadeStepIn = function (id, callback) {
                 if (id >= settings.length)
                     throw new IllegalStateException('Step <' + id + '> is not loaded');
-				changeBarProgress($('div.trainer-progress-bar div'), Rotator.getStepsCount(), id + 1);
+                self.setBreadCrumbStepNames(id + 1);
+                changeBarProgress($('div.trainer-progress-bar div'), Rotator.getStepsCount(), id + 1);
                 var old = stepSpace.find('div[data-step="' + visibleStep + '"]');
                 if (old.is(':visible')) {
                     old.slideToggle().promise()
@@ -2414,8 +2382,8 @@ var Rotator = null;
                 else
                     return settings[visibleStep]['score'];
             };
-			
-			/**
+
+            /**
              * Gets a max score for next step
              * @param step {Number} step's index
              * @returns {Numeric} amount of points for this step
@@ -2426,31 +2394,51 @@ var Rotator = null;
                 else
                     return settings[visibleStep + 1]['score'];
             };
-			
-			/**
+
+            /**
              * Gets an array of scores for each step
              * @returns {Array} of scores
              */
             this.getAllStepScores = function () {
-				var scores = [];
+                var scores = [];
                 var totalSteps = Object.keys(settings).length;
-				for ( var i = 0; i < totalSteps; i++)
-					scores.push(settings[i].score);
-				return scores;
+                for (var i = 0; i < totalSteps; i++)
+                    scores.push(settings[i].score);
+                return scores;
             };
-			
-			/**
+
+            /**
              * Gets an array of step names for each step
              * @returns {Array} of step names
              */
             this.getAllStepNames = function () {
-				var names = [];
+                var names = [];
                 var totalSteps = Object.keys(settings).length;
-				for ( var i = 0; i < totalSteps; i++)
-					namess.push(settings[i].filename);
-				return names;
+                for (var i = 0; i < totalSteps; i++)
+                    names.push(settings[i].filename);
+                return names;
             };
 
+            this.setBreadCrumb = function (b) {
+                if (typeof b !== 'object') throw new IllegalArgumentException("BreadCrumb should be an object!");
+                breadCrumb = b;
+            };
+            /**
+             * Sets a breadcrumb at top of page to display step names
+             */
+            this.setBreadCrumbStepNames = function (step) {
+                var result = '';
+                for (var i = 1; i <= stepsCount; i++) {
+                    if (step === i)
+                        result += '<li><a href="#">{{STEP' + i + '_NAME}}</a></li>';
+                    else {
+                        result += '<li>{{STEP' + i + '_NAME}}</li>';
+                    }
+                }
+                if (Tpl.templatable(result))
+                    result = new Tpl().setTemplate(result).render();
+                breadCrumb.html(result);
+            };
             /**
              * Performs transition to the next level
              * @param callback {function} callback to call after changing step
@@ -2474,9 +2462,9 @@ var Rotator = null;
                 }
                 next >= lastLoadedStep ? this.disableNextButton() : this.enableNextButton();
                 this.enablePrevButton();
-				
-				$('div.validation-alert-success').fadeOut();
-				$('div.validation-alert-danger').fadeOut();
+
+                $('div.validation-alert-success').fadeOut();
+                $('div.validation-alert-danger').fadeOut();
                 return true;
             };
 
@@ -2523,25 +2511,22 @@ var Rotator = null;
                     });
                 });
             };
-			
-			/**
+
+            /**
              * Changes progres bar's fullness
              */
             var changeBarProgress = function (bar, total, next) {
-                if(total != 0)
-					fullness = (next / total * 100).toFixed(1) + '%';
-				else
-					fullness = '0%';
-				bar.width(fullness);
-				return true;
+                if (total != 0)
+                    fullness = (next / total * 100).toFixed(1) + '%';
+                else
+                    fullness = '0%';
+                bar.width(fullness);
+                return true;
             };
         });
-})(jQuery, Logger, Templatetor, Scorer, Service, StepInvoker, Cogwheel);	
+})(jQuery, Logger, Templatetor, Scorer, Service, StepInvoker, Cogwheel);
 
 
-
-
-	
 //----------------------------VALIDATOR PART-----------------------------------------------------
 var Validator = null;
 
@@ -2568,11 +2553,11 @@ var Validator = null;
             var isStrict = false;
             var attempts = 3;
             var ignoreCase = true;
-			
-			var penalty = 0.5;
-			var currentMaxScore = _Rotator.getNextStepScore();
-			var dab = false;
-			var esfa = false;
+
+            var penalty = 0.5;
+            var currentMaxScore = _Rotator.getNextStepScore();
+            var dab = false;
+            var esfa = false;
             /**
              * Sets a strict mode for Validator
              * @param b {Boolean} strict mode switch
@@ -2608,18 +2593,18 @@ var Validator = null;
                 attempts = a;
                 return this;
             };
-			
-			/**
+
+            /**
              * Gets an amount of attempts in strict mode.
              * @returns {Validator} current object (flow)
              */
             this.getAttempts = function () {
                 if (typeof attempts !== "number")
-                    throw new IllegalArgumentException("Amount of attempts should be a number"); 
+                    throw new IllegalArgumentException("Amount of attempts should be a number");
                 return attempts;
             };
-			
-			/**
+
+            /**
              * Sets an amount of attempts in strict mode, that user can use to write a correct answer.
              * @param a {number} amount of attempts
              * @returns {Validator} current object (flow)
@@ -2627,14 +2612,14 @@ var Validator = null;
             this.setAttemptsOnCheckButton = function (b) {
                 if (typeof b !== "object")
                     throw new IllegalArgumentException("Check button should be an object");
-				
-				var result = '{{CHECK}} ({{ATTEMPTS_LEFT}}' + (attempts - 1 >= 0 ? attempts - 1 : 0) + ')';
-				if (_Templatetor.templatable(result))
+
+                var result = '{{CHECK}} ({{ATTEMPTS_LEFT}}' + (attempts - 1 >= 0 ? attempts - 1 : 0) + ')';
+                if (_Templatetor.templatable(result))
                     result = new _Templatetor().setTemplate(result).render();
                 b.html(result);
             };
-				
-			/**
+
+            /**
              * Sets penalty for each failed try in strict mode.
              * @param p {number} penalty size
              * @returns {Validator} current object (flow)
@@ -2645,55 +2630,55 @@ var Validator = null;
                 penalty = p;
                 return this;
             };
-			
-			/**
+
+            /**
              * Gets penalty.
              * @returns {Validator} current object (flow)
              */
             this.getPenalty = function () {
                 if (typeof penalty !== "number" || penalty <= 0)
-                    throw new IllegalArgumentException("Penalty should be a number greater then zero"); 
+                    throw new IllegalArgumentException("Penalty should be a number greater then zero");
                 return penalty;
             };
-			
-			/**
+
+            /**
              * Fixes radio buttons adding value to them so validator can read them properly.
              */
-			this.fixRadio = function(o) {
-				var checked = $(':radio[name="' + o + '"]').filter(":checked").attr('values');
-				$('input[name="' + o + '"]').attr('value', checked);
-			}
-			
-			/**
+            this.fixRadio = function (o) {
+                var checked = $(':radio[name="' + o + '"]').filter(":checked").attr('values');
+                $('input[name="' + o + '"]').attr('value', checked);
+            };
+
+            /**
              * Fixes checkboxes adding value to them so validator can read them properly.
-			 * Second param - whether you want the non-checked state of checkbox to be a correct answer.
+             * Second param - whether you want the non-checked state of checkbox to be a correct answer.
              */
-			this.fixCheckbox = function(o, n) {
-				if (n) checked = $(':input[name="' + o + '"]').not(":checked").attr('values');
-				else checked = $(':input[name="' + o + '"]').filter(":checked").attr('values');
-				$('input[name="' + o + '"]').attr('value', checked);
-			}
-			
-			/**
+            this.fixCheckbox = function (o, n) {
+                if (n) checked = $(':input[name="' + o + '"]').not(":checked").attr('values');
+                else checked = $(':input[name="' + o + '"]').filter(":checked").attr('values');
+                $('input[name="' + o + '"]').attr('value', checked);
+            };
+
+            /**
              * Disables backlighting of correct/uncorrect answers in the current step.
              */
-			this.disableAnswersBacklight = function(b) {
-				if (typeof b !== "boolean")
-                    throw new IllegalArgumentException("Disabling answers backlightning trigger should be boolean");
+            this.disableAnswersBacklight = function (b) {
+                if (typeof b !== "boolean")
+                    throw new IllegalArgumentException("Disabling answers backlighting trigger should be boolean");
                 dab = b;
                 return this;
-			}
-			
-			/**
+            };
+
+            /**
              * Enables alert popup after success/fail to do a step
              */
-			this.enableStepFinishAlert = function(b) {
-				if (typeof b !== "boolean")
+            this.enableStepFinishAlert = function (b) {
+                if (typeof b !== "boolean")
                     throw new IllegalArgumentException("Enabling step finish alert trigger should be boolean");
                 esfa = b;
                 return this;
-			}
-			
+            };
+
             /**
              * Adds an object to observe by the Validator.
              * @param o {jQuery} wrapped DOM element where to get value to check
@@ -2704,13 +2689,13 @@ var Validator = null;
             this.addValidator = function (o, v, multicorrect, multiple) {
                 LOGGER.debug('VALIDATOR ADDED:', o, v, multicorrect, multiple);
                 if (!(o instanceof $))
-                    throw new IllegalArgumentException('Object should be an instance of $');
+                    throw new IllegalArgumentException('Object ' + o.val() + ' should be an instance of $');
                 else if (o.length == 0)
-                    throw new IllegalArgumentException('DOM Element ' + o.selector + " does't exists. Validator not added");
+                    throw new IllegalArgumentException('DOM Element ' + o.selector + " doesn't exist. Validator not added");
 
-                if (typeof(v) === 'function'){}
-                else
-                if (!$.isArray(v)) {
+                if (typeof(v) === 'function') {
+                }
+                else if (!$.isArray(v)) {
                     v = [v + ''];
                 } else {
                     for (var i in v)
@@ -2719,7 +2704,7 @@ var Validator = null;
                 targets.push([o, v, !!multicorrect, !!multiple]);
                 return this;
             };
-			
+
             /**
              * Method validates all Validator's observables.
              */
@@ -2733,19 +2718,34 @@ var Validator = null;
                     throw new IllegalStateException('Targets are empty, nothing to check');
                 else if (attempts <= 0)
                     throw new IllegalStateException('No attempts left. Go next level.');
-			 
+
                 LOGGER.debug("----------- FOR LOOP ------------- ");
                 var checkState = true,
                     invalidTargets = 0;
                 for (var i = 0; i < targets.length; i++) {
                     var target = targets[i][0];
-                    var currentValue = (target.val() ? target.val() : target.attr("value")) + '';
-					
-					currentValue = currentValue.replace(/,(\d+)$/,'.$1');
-					
-					var correctValues = targets[i][1];
+                    var currentValue = '';
+                    if (target.attr("type") === "radio") {
+                        target.parent().siblings().each(function () {
+                            var radioVal = $(this).find('input[type=radio]:checked').val();
+                            if (radioVal !== undefined) currentValue = radioVal;
+                        });
+                    }
+                    else if (target.attr("type") === "checkbox") {
+                        if (target.is(":checked")) {
+                            currentValue = 'true';
+                        } else {
+                            currentValue = 'false';
+                        }
+                    }
+                    else {
+                        currentValue = (target.val() ? target.val() : target.attr("value")) + '';
+                    }
+                    currentValue = currentValue.replace(/,(\d+)$/, '.$1');
+
+                    var correctValues = targets[i][1];
                     var isValid = true;
-                    if (typeof(correctValues) === 'function'){
+                    if (typeof(correctValues) === 'function') {
                         LOGGER.debug("# VALIDATING TARGET WITH FUNCTION <" + target.selector + ">:", "Current value:", currentValue);
                         isValid = correctValues(currentValue);
                     }
@@ -2755,19 +2755,19 @@ var Validator = null;
                             for (var k in correctValues)
                                 correctValues[k] = correctValues[k].toLowerCase();
                         }
-                        if(targets[i][2] && !targets[i][3]) currentValue = currentValue.split(',');
-						else if (targets[i][3]) currentValue = currentValue.split(',');
-						else currentValue = [currentValue];
-						
-						if (!currentValue && isStrict === false) {
-                             checkState = false;
-                             continue;
+                        if (targets[i][2] && !targets[i][3]) currentValue = currentValue.split(',');
+                        else if (targets[i][3]) currentValue = currentValue.split(',');
+                        else currentValue = [currentValue];
+
+                        if (!currentValue && isStrict === false) {
+                            checkState = false;
+                            continue;
                         }
                         LOGGER.debug("# VALIDATING TARGET <" + target.selector + ">:", "Current value:", currentValue, "Correct values:", correctValues);
-						if (targets[i][3] && currentValue.length != correctValues.length)
+                        if (targets[i][3] && currentValue.length != correctValues.length)
                             isValid = false;
                         else {
-                            for (var j = 0; j < currentValue.length; j++) { 
+                            for (var j = 0; j < currentValue.length; j++) {
                                 if ($.inArray(currentValue[j], correctValues) == -1)
                                     isValid = false;
                             }
@@ -2776,12 +2776,14 @@ var Validator = null;
                     LOGGER.debug(target, target.prev());
                     if (isValid) {
                         LOGGER.debug('Target is good', target, 'target.val = ' + currentValue, 'correctValues:', correctValues);
-						if(!dab)
-							$('* [for="' + target.attr('name') + '"]').removeClass('has-error').addClass('has-success');
+                        if (!dab) {
+                            $('* [for="' + target.attr('name') + '"]').removeClass('has-error').addClass('has-success');
+                        }
+
                     } else {
                         LOGGER.debug('Target is wrong', target, 'target.val = ' + currentValue, 'correctValues:', correctValues);
-						if(!dab)
-							$('* [for="' + target.attr('name') + '"]').removeClass('has-success').addClass('has-error');
+                        if (!dab)
+                            $('* [for="' + target.attr('name') + '"]').removeClass('has-success').addClass('has-error');
                         invalidTargets++;
                         checkState = false;
                     }
@@ -2791,26 +2793,26 @@ var Validator = null;
                     _Rotator.enableNextButton();
                     _Scorer.addScore(Math.round(currentMaxScore));
                     fulfilled = true;
-					if(esfa) $('div.validation-alert-success').fadeIn();
+                    if (esfa) $('div.validation-alert-success').fadeIn();
                 } else {
                     if (isStrict === true) {
                         attempts--;
-						currentMaxScore -= penalty;
+                        currentMaxScore -= penalty;
                     }
-					_Rotator.disableNextButton();
-					if (attempts <= 0) {
-						LOGGER.debug("NO attempts left");
-						_Rotator.enableNextButton();
-						var stepScore = currentMaxScore;
+                    _Rotator.disableNextButton();
+                    if (attempts <= 0) {
+                        LOGGER.debug("NO attempts left");
+                        _Rotator.enableNextButton();
+                        var stepScore = currentMaxScore;
                         var totalElements = targets.length;
                         var scoreOfOne = stepScore / totalElements;
                         var score = stepScore - scoreOfOne * invalidTargets;
                         _Scorer.addScore(Math.round(score));
                         fulfilled = true;
-						if (esfa) $('div.validation-alert-danger').fadeIn();
+                        if (esfa) $('div.validation-alert-danger').fadeIn();
                         return;
-					}
-                    
+                    }
+
                 }
                 return checkState;
             };
