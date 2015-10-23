@@ -711,9 +711,7 @@ var ScriptInvoker;
                     trainerSetting = data;
                     if (typeof(callback) === "function")
                         callback();
-                }).fail(function (jqxhr, settings, exception) {
-                    throw new IllegalAsyncStateException(exception);
-                });
+                }).fail(commonAjaxFailException);
             };
 
             /**
@@ -770,11 +768,8 @@ var ScriptInvoker;
              */
             this.notifyServer = function (callback) {
                 LOGGER.debug("Notifying server...");
-                var host = window.location.href;
-                host = host.substring(0, host.lastIndexOf('/') + 1);
-                LOGGER.debug("Host:" + host);
                 var server_info_url, server_url, send_report_url;
-                server_info_url = host + 'server_info.txt';
+                server_info_url = getActionPath() + 'server_info.txt';
                 LOGGER.debug('server_info_url: ' + server_info_url);
                 $.get(server_info_url)
                     .done(function (data) {
@@ -786,20 +781,25 @@ var ScriptInvoker;
                                 reportUrl = send_report_url;
                                 if (typeof callback === "function")
                                     callback();
-                            }).fail(function (jqxhr, settings, exception) {
-                                throw new IllegalAsyncStateException(exception);
-                            });
-                    }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                            }).fail(commonAjaxFailException);
+                    }).fail(commonAjaxFailException);
             };
 
             /**
-             * Pushes user's results to SSU server
+             * Pushes user's results to SSU server. Old Behaviour, just for backward capability
              * @param options additional options to add to userResult variable
              * @param callback func i'll call when transferring is done
              */
             this.pushResults = function (options, callback) {
+                return  Service.pushResultsPromise(options).then(callback,commonAjaxFailException);
+            }
+
+
+            /**
+             * Pushes user's results to SSU server. Behaviour for done and fall is defined by .done and .fail methodes.
+             * @param options additional options to add to userResult variable
+             */
+            this.pushResultsPromise = function (options) {
                 if (!reportUrl)
                     throw new IllegalStateException('Server is not notified yet');
 
@@ -817,13 +817,11 @@ var ScriptInvoker;
                 for(var key in options) {
                     userResult[key] = options[key];
                 }
-                $.post(reportUrl, userResult).done(function (data) {
-                    LOGGER.debug("RESULT: " + data);
-                    if (typeof callback === "function")
-                        callback(data);
-                }).fail(function (jqxhr, settings, exception) {
-                    throw new IllegalAsyncStateException(exception);
-                });
+                return  $.post(reportUrl, userResult)
+                    .done(function (data) {
+                        LOGGER.debug("RESULT: " + data);
+                        return data;
+                    });
             };
 
             /**
@@ -836,15 +834,20 @@ var ScriptInvoker;
                 Cogwheel.show();
                 Scorer.end();
                 is_passed = 0;
-                self.pushResults();
-                Cogwheel.setText("Trainer ended!");
-                Cogwheel.hideWithDelay(5000);
+                self.pushResultsPromise()
+                    .done(function(){
+                        Cogwheel.setText("Trainer ended!");
+                        Cogwheel.hide();
+                    })
+                    .fail(function(){
+                        Cogwheel.setText("Trainer ended! But sending is fall :(");
+                    })
             };
 
             /**
              *  Return action URL ( path without id)
              */
-            function getActionPath (){
+            function getActionPath() {
                 var host = window.location.href;
                 host = host.substring(0, host.lastIndexOf('/') + 1);
                 LOGGER.debug("ActionPath:" + host);
@@ -855,8 +858,8 @@ var ScriptInvoker;
                 throw new IllegalAsyncStateException(exception);
             };
 
-            var setConfigValues = function(data, holder){
-                LOGGER.debug("Set config values by string: "+data);
+            var setConfigValues = function (data, holder) {
+                LOGGER.debug("Set config values by string: " + data);
                 if (!holder)
                     holder = Service.getTrainerConfig();
                 data = data.split('&');
@@ -872,7 +875,7 @@ var ScriptInvoker;
              * Return storageUrls holder (put_url, and get_url)
              * @returns poromise with url
              */
-            this.getStorageUrl = function(){
+            this.getStorageUrl = function () {
                 if (storageUrl) {
                     return $.when(storageUrl);
                 }
@@ -881,7 +884,7 @@ var ScriptInvoker;
                         storageUrl = {};
                         setConfigValues(data, storageUrl);
                         return storageUrl;
-                    },commonAjaxFailException)
+                    }, commonAjaxFailException)
             };
 
             /**
@@ -891,22 +894,20 @@ var ScriptInvoker;
              */
             this.fetchStorageInfo = function (callback) {
                 LOGGER.debug("Get shared train-related data from server...");
-                this.getStorageUrl()
-                    .then( function (url){
-                        LOGGER.debug('Storage url (fetch): '+url);
+                return this.getStorageUrl()
+                    .then(function (url) {
                         var get_url = url['get_url'];
                         if (!get_url)
                             throw new IllegalStateException("Problem with storage get_url");
                         return get_url
                     })
-                    .then( function(url) {return $.get(url) })
-                    .then( function (data) {
-                                LOGGER.debug("RESULT: " + data);
-                                setConfigValues(data);
-                                if (typeof callback === "function")
-                                    callback(data);
-                            }, commonAjaxFailException)
-                    .done();
+                    .then($.get)
+                    .then(function (data) {
+                        LOGGER.debug("RESULT: " + data);
+                        setConfigValues(data);
+                        if (typeof callback === "function")
+                            callback(data);
+                    }, commonAjaxFailException);
             };
 
             /**
@@ -915,19 +916,20 @@ var ScriptInvoker;
              * @param push_data - hash, data to bush
              * @param callback - callback function, run if data is pushed well
              */
-            this.pushStorageInfo = function(push_data, callback){
+            this.pushStorageInfo = function (push_data, callback) {
                 LOGGER.debug("Push shared train-related data to server...");
                 this.getStorageUrl()
-                    .done( function (url) {
+                    .done(function (url) {
                         var put_url = url['put_url'];
                         if (!put_url)
                             throw new IllegalStateException("Problem with storage put_url");
                         return put_url;
                     })
-                    .done( function(url) {$.post(url,push_data)})
-                    .then( callback, commonAjaxFailException);
-            }
-
+                    .done(function (url) {
+                        $.post(url, push_data)
+                    })
+                    .then(callback, commonAjaxFailException);
+            };
 
             /**
              * Get's help from SSU server
@@ -948,9 +950,14 @@ var ScriptInvoker;
                                 is_done: 1,
                                 is_passed: 0
                             };
-                            self.pushResults(options);
-                            Cogwheel.setText("Help request sent!");
-                            Cogwheel.hideWithDelay(5000);
+                            self.pushResultsPromise(options)
+                                .done(function() {
+                                    Cogwheel.setText("Help request sent!");
+                                    Cogwheel.hide();
+                                })
+                                .fail( function() {
+                                        Cogwheel.setText("Fail!");
+                                });
                         }
                     });
                 }, 1000);
@@ -965,6 +972,7 @@ var ScriptInvoker;
             this.getHelp = function (callback) {
                 Cogwheel.show();
                 Scorer.end();
+                //TODO Add i18n
                 var helper = prompt("Please enter help message text:");
                 window.setTimeout(function () {
                     html2canvas(document.body, {
@@ -975,9 +983,14 @@ var ScriptInvoker;
                                 is_done: 1,
                                 is_passed: 0
                             };
-                            self.pushResults(options);
-                            Cogwheel.setText("Help request sent!");
-                            Cogwheel.hideWithDelay(5000);
+                            self.pushResultsPromise(options)
+                                .done( function (){
+                                    Cogwheel.setText("Help request sent!");
+                                    Cogwheel.hide();
+                                })
+                                .fail(function(){
+                                    Cogwheel.setText("Fail!");
+                                });
                         }
                     });
                 }, 1000);
