@@ -6,9 +6,9 @@ $(document).ready(function () {
         .show();
 
     Cogwheel.setText('Loading trainer settings');
-    Service.loadConfig(function () {
+
+    var init = function () {
         var config = Service.getTrainerConfig();
-        window.PRODUCTION = config['PRODUCTION'];
 
         if (PRODUCTION === true) {
             Logger.production();
@@ -54,7 +54,14 @@ $(document).ready(function () {
                 }
             });
         });
-    });
+    };
+    Service.loadConfig(
+        function () {
+            var config = Service.getTrainerConfig();
+            window.PRODUCTION = config['PRODUCTION'];
+
+            PRODUCTION ? Service.fetchStorageInfo(init) : init();
+        });
 });
 
 
@@ -664,6 +671,12 @@ var ScriptInvoker;
             var trainerVersion = '3.50';
             var trainerSetting = null;
             var reportUrl;
+            /**
+             * Trainer-related shared (coss-session and cross-user) storage for put_url and get_url
+             * Can be accessed via getStorageUrl
+             */
+            var storageUrl;
+            var help_canvas;
             var is_passed = 1;
             var self = this;
 
@@ -706,12 +719,15 @@ var ScriptInvoker;
             /**
              * Returns a value from URL query
              * @param name {String} query param's name
+             * @param url {String} source for value extraction. Optional parameter, by default window.location.search
              * @returns {String} value of param
              */
-            this.getUrlParam = function (name) {
+            this.getUrlParam = function (name, url) {
+                if (!url)
+                  url = window.location.search;
                 name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
                 var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-                    results = regex.exec(window.location.search);
+                    results = regex.exec(url);
                 return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
             };
 
@@ -824,6 +840,94 @@ var ScriptInvoker;
                 Cogwheel.setText("Trainer ended!");
                 Cogwheel.hideWithDelay(5000);
             };
+
+            /**
+             *  Return action URL ( path without id)
+             */
+            function getActionPath (){
+                var host = window.location.href;
+                host = host.substring(0, host.lastIndexOf('/') + 1);
+                LOGGER.debug("ActionPath:" + host);
+                return host;
+            }
+
+            var commonAjaxFailException =  function (jqxhr, settings, exception) {
+                throw new IllegalAsyncStateException(exception);
+            };
+
+            var setConfigValues = function(data, holder){
+                LOGGER.debug("Set config values by string: "+data);
+                if (!holder)
+                    holder = Service.getTrainerConfig();
+                data = data.split('&');
+                var arrayLength = data.length;
+                for (var i = 0; i < arrayLength; i++) {
+                    var key_and_value = data[i].split('=');
+                    holder[key_and_value[0]] = decodeURIComponent(key_and_value[1].replace(/\+/g, " "));
+                }
+                return holder;
+            };
+
+            /**
+             * Return storageUrls holder (put_url, and get_url)
+             * @returns poromise with url
+             */
+            this.getStorageUrl = function(){
+                if (storageUrl) {
+                    return $.when(storageUrl);
+                }
+                return $.when($.get(getActionPath() + 'storage_info.txt'))
+                    .then(function (data) {
+                        storageUrl = {};
+                        setConfigValues(data, storageUrl);
+                        return storageUrl;
+                    },commonAjaxFailException)
+            };
+
+            /**
+             * Get stored train-related data from SSU server. Data is cross-session and cross-user visible.
+             * Value 'max_score' is rewrited by server.
+             * @param callback func that will be called after fetching data, if data is fetched well.
+             */
+            this.fetchStorageInfo = function (callback) {
+                LOGGER.debug("Get shared train-related data from server...");
+                this.getStorageUrl()
+                    .then( function (url){
+                        LOGGER.debug('Storage url (fetch): '+url);
+                        var get_url = url['get_url'];
+                        if (!get_url)
+                            throw new IllegalStateException("Problem with storage get_url");
+                        return get_url
+                    })
+                    .then( function(url) {return $.get(url) })
+                    .then( function (data) {
+                                LOGGER.debug("RESULT: " + data);
+                                setConfigValues(data);
+                                if (typeof callback === "function")
+                                    callback(data);
+                            }, commonAjaxFailException)
+                    .done();
+            };
+
+            /**
+             * Push data to shared storage.
+             * params 'max_score' is ignored, and revirited by server.
+             * @param push_data - hash, data to bush
+             * @param callback - callback function, run if data is pushed well
+             */
+            this.pushStorageInfo = function(push_data, callback){
+                LOGGER.debug("Push shared train-related data to server...");
+                this.getStorageUrl()
+                    .done( function (url) {
+                        var put_url = url['put_url'];
+                        if (!put_url)
+                            throw new IllegalStateException("Problem with storage put_url");
+                        return put_url;
+                    })
+                    .done( function(url) {$.post(url,push_data)})
+                    .then( callback, commonAjaxFailException);
+            }
+
 
             /**
              * Get's help from SSU server
@@ -2012,22 +2116,6 @@ var Cogwheel = new
             if (!cogwheelElement)
                 throw new IllegalStateException('Set cogwheel $ object first!');
             cogwheelElement.modal('hide');
-            return this;
-        };
-
-        /**
-         * Hides a loading splash with delay
-         * @param delay to wait until hiding
-         * @returns {Cogwheel} current object (flow)
-         */
-        this.hideWithDelay = function (delay) {
-            if (!cogwheelElement)
-                throw new IllegalStateException('Set cogwheel $ object first!');
-            if (typeof delay !== "number")
-                throw new IllegalStateException('Delay value should be a number!');
-            window.setTimeout(function() {
-                cogwheelElement.modal('hide');
-            }, delay);
             return this;
         };
     });
