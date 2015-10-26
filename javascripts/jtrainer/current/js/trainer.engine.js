@@ -7,6 +7,9 @@ $(document).ready(function () {
 
     Cogwheel.setText('Loading trainer settings');
 
+    BreadCrumb.setBreadCrumbElement($('.bc-steps'));
+    ProgressBar.setProgressBarElement($('div.trainer-progress-bar div'));
+
     var init = function () {
         var config = Service.getTrainerConfig();
 
@@ -16,7 +19,6 @@ $(document).ready(function () {
             $.ajaxSetup({cache: false});
             Logger.debugging();
         }
-        Rotator.setBreadCrumb($('.bc-steps'));
         Cogwheel.setText('Setting up step rotator');
         Rotator.setStepSpace($('section.stepspace'));
         Rotator.setNextButton($('#nextController'))
@@ -723,7 +725,7 @@ var ScriptInvoker;
              */
             this.getUrlParam = function (name, url) {
                 if (!url)
-                  url = window.location.search;
+                    url = window.location.search;
                 name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
                 var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
                     results = regex.exec(url);
@@ -792,7 +794,7 @@ var ScriptInvoker;
              * @param callback func i'll call when transferring is done
              */
             this.pushResults = function (options, callback) {
-                return  Service.pushResultsPromise(options).then(callback,commonAjaxFailException);
+                return Service.pushResultsPromise(options).then(callback, commonAjaxFailException);
             };
 
 
@@ -815,10 +817,10 @@ var ScriptInvoker;
                     is_passed: is_passed,
                     user_reply: uScoreInPercent >= 60 ? "YES - " + uScoreInPercent + "%" : "NO - " + uScoreInPercent + "%"
                 };
-                for(var key in options) {
+                for (var key in options) {
                     userResult[key] = options[key];
                 }
-                return  $.post(reportUrl, userResult)
+                return $.post(reportUrl, userResult)
                     .done(function (data) {
                         LOGGER.debug("RESULT: " + data);
                         return data;
@@ -836,11 +838,11 @@ var ScriptInvoker;
                 Scorer.end();
                 is_passed = 0;
                 self.pushResultsPromise()
-                    .done(function(){
+                    .done(function () {
                         Cogwheel.setText("Trainer ended!");
                         Cogwheel.hide();
                     })
-                    .fail(function(){
+                    .fail(function () {
                         Cogwheel.setText("Trainer ended! But sending is fall :(");
                     })
             };
@@ -855,7 +857,7 @@ var ScriptInvoker;
                 return host;
             }
 
-            var commonAjaxFailException =  function (jqxhr, settings, exception) {
+            var commonAjaxFailException = function (jqxhr, settings, exception) {
                 throw new IllegalAsyncStateException(exception);
             };
 
@@ -952,12 +954,12 @@ var ScriptInvoker;
                                 is_passed: 0
                             };
                             self.pushResultsPromise(options)
-                                .done(function() {
+                                .done(function () {
                                     Cogwheel.setText("Help request sent!");
                                     Cogwheel.hide();
                                 })
-                                .fail( function() {
-                                        Cogwheel.setText("Fail!");
+                                .fail(function () {
+                                    Cogwheel.setText("Fail!");
                                 });
                         }
                     });
@@ -985,11 +987,11 @@ var ScriptInvoker;
                                 is_passed: 0
                             };
                             self.pushResultsPromise(options)
-                                .done( function (){
+                                .done(function () {
                                     Cogwheel.setText("Help request sent!");
                                     Cogwheel.hide();
                                 })
-                                .fail(function(){
+                                .fail(function () {
                                     Cogwheel.setText("Fail!");
                                 });
                         }
@@ -2135,10 +2137,123 @@ var Cogwheel = new
     });
 
 
+//-----------------------------BreadCrumb PART-----------------------------------------------------
+var BreadCrumb = new
+    (function () {
+        var breadCrumbElement;
+
+        /**
+         * Sets a breadcrumb to display step names
+         * @param o {jQuery} wrapped element
+         * @returns {Cogwheel} current object (flow)
+         */
+        this.setBreadCrumbElement = function (o) {
+            if (!(o instanceof $))
+                throw new IllegalArgumentException('BreadCrumb should be an instance of $');
+            breadCrumbElement = o;
+            return this;
+        };
+
+        /**
+         * Sets a breadcrumb at top of page to display step names
+         */
+        this.setBreadCrumbStepNames = function (step) {
+            var result = '';
+            for (var i = 1; i <= Rotator.getStepsCount(); i++) {
+                if (step === i)
+                    result += '<li><a href="#">{{STEP' + i + '_NAME}}</a></li>';
+                else {
+                    result += '<li>{{STEP' + i + '_NAME}}</li>';
+                }
+            }
+            if (Templatetor.templatable(result))
+                result = new Templatetor().setTemplate(result).render();
+            breadCrumbElement.html(result);
+        };
+
+
+        /**
+         * Shows breadcrumb
+         * @returns {BreadCrumb} current object (flow)
+         */
+        this.show = function () {
+            if (!breadCrumbElement)
+                throw new IllegalStateException('Set breadcrumb $ object first!');
+            breadCrumbElement.show();
+            return this;
+        };
+
+        /**
+         * Hides breadcrumb
+         * @returns {BreadCrumb} current object (flow)
+         */
+        this.hide = function () {
+            if (!breadCrumbElement)
+                throw new IllegalStateException('Set breadcrumb $ object first!');
+            breadCrumbElement.hide();
+            return this;
+        };
+    });
+
+
+//-----------------------------ProgressBar PART-----------------------------------------------------
+var ProgressBar = new
+    (function () {
+        var progressBarElement;
+
+        /**
+         * Sets a progressbar to display trainer completition progress
+         * @param o {jQuery} wrapped element
+         * @returns {Cogwheel} current object (flow)
+         */
+        this.setProgressBarElement = function (o) {
+            if (!(o instanceof $))
+                throw new IllegalArgumentException('ProgressBar should be an instance of $');
+            progressBarElement = o;
+            return this;
+        };
+
+        /**
+         * Changes progressbar completition state
+         */
+        this.changeProgressBarState = function (total, next) {
+            var fullness;
+            if (total != 0)
+                fullness = (next / total * 100).toFixed(1) + '%';
+            else
+                fullness = '0%';
+            progressBarElement.width(fullness);
+            return true;
+        };
+
+
+        /**
+         * Shows progressbar
+         * @returns {ProgressBar} current object (flow)
+         */
+        this.show = function () {
+            if (!progressBarElement)
+                throw new IllegalStateException('Set progressbar $ object first!');
+            progressBarElement.show();
+            return this;
+        };
+
+        /**
+         * Hides progressbar
+         * @returns {ProgressBar} current object (flow)
+         */
+        this.hide = function () {
+            if (!progressBarElement)
+                throw new IllegalStateException('Set progressbar $ object first!');
+            progressBarElement.hide();
+            return this;
+        };
+    });
+
 //------------------------------------ROTATOR PART-----------------------------------------------------
 var Rotator = null;
 
-(function ($, Log, Tpl, _Scorer, _Service, _StepInvoker, _Cogwheel) {
+(function ($, Log, Tpl, _Scorer, _Service, _StepInvoker, _Cogwheel, _BreadCrumb, _ProgressBar) {
     /**
      * Rotator is one of the main object of trainer that is responsible for the rotation
      * of steps
@@ -2162,8 +2277,6 @@ var Rotator = null;
 
             var nextButton = null;
             var prevButton = null;
-
-            var breadCrumb = null;
 
             /**
              * Ties up an wrapped DOM element of Prev Button
@@ -2300,7 +2413,7 @@ var Rotator = null;
                 if (stepsCount)
                     return stepsCount;
                 else
-                    throw new llegalStateException('stepsCount is not initialized');
+                    throw new IllegalStateException('stepsCount is not initialized');
             };
 
             /**
@@ -2433,8 +2546,8 @@ var Rotator = null;
             var fadeStepIn = function (id, callback) {
                 if (id >= settings.length)
                     throw new IllegalStateException('Step <' + id + '> is not loaded');
-                self.setBreadCrumbStepNames(id + 1);
-                changeBarProgress($('div.trainer-progress-bar div'), Rotator.getStepsCount(), id + 1);
+                _BreadCrumb.setBreadCrumbStepNames(id + 1);
+                _ProgressBar.changeProgressBarState(Rotator.getStepsCount(), id + 1);
                 var old = stepSpace.find('div[data-step="' + visibleStep + '"]');
                 if (old.is(':visible')) {
                     old.slideToggle().promise()
@@ -2521,26 +2634,6 @@ var Rotator = null;
                 return names;
             };
 
-            this.setBreadCrumb = function (b) {
-                if (typeof b !== 'object') throw new IllegalArgumentException("BreadCrumb should be an object!");
-                breadCrumb = b;
-            };
-            /**
-             * Sets a breadcrumb at top of page to display step names
-             */
-            this.setBreadCrumbStepNames = function (step) {
-                var result = '';
-                for (var i = 1; i <= stepsCount; i++) {
-                    if (step === i)
-                        result += '<li><a href="#">{{STEP' + i + '_NAME}}</a></li>';
-                    else {
-                        result += '<li>{{STEP' + i + '_NAME}}</li>';
-                    }
-                }
-                if (Tpl.templatable(result))
-                    result = new Tpl().setTemplate(result).render();
-                breadCrumb.html(result);
-            };
             /**
              * Performs transition to the next level
              * @param callback {function} callback to call after changing step
@@ -2613,20 +2706,8 @@ var Rotator = null;
                     });
                 });
             };
-
-            /**
-             * Changes progres bar's fullness
-             */
-            var changeBarProgress = function (bar, total, next) {
-                if (total != 0)
-                    fullness = (next / total * 100).toFixed(1) + '%';
-                else
-                    fullness = '0%';
-                bar.width(fullness);
-                return true;
-            };
         });
-})(jQuery, Logger, Templatetor, Scorer, Service, StepInvoker, Cogwheel);
+})(jQuery, Logger, Templatetor, Scorer, Service, StepInvoker, Cogwheel, BreadCrumb, ProgressBar);
 
 
 //----------------------------VALIDATOR PART-----------------------------------------------------
