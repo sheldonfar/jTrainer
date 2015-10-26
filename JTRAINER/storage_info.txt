@@ -1,1 +1,1 @@
-get_url=/report.reply&put_url=/report.reply
+get_url=/jtrainer/report.reply&put_url=/jtrainer/report.reply

@@ -671,6 +671,7 @@ var ScriptInvoker;
             var trainerVersion = '3.50';
             var trainerSetting = null;
             var reportUrl;
+
             /**
              * Trainer-related shared (coss-session and cross-user) storage for put_url and get_url
              * Can be accessed via getStorageUrl
@@ -786,13 +787,13 @@ var ScriptInvoker;
             };
 
             /**
-             * Pushes user's results to SSU server. Old Behaviour, just for backward capability
+             * Pushes user's results to SSU server. Old Behaviour, just for backward compatibility
              * @param options additional options to add to userResult variable
              * @param callback func i'll call when transferring is done
              */
             this.pushResults = function (options, callback) {
                 return  Service.pushResultsPromise(options).then(callback,commonAjaxFailException);
-            }
+            };
 
 
             /**
@@ -873,7 +874,7 @@ var ScriptInvoker;
 
             /**
              * Return storageUrls holder (put_url, and get_url)
-             * @returns poromise with url
+             * @returns promise with url
              */
             this.getStorageUrl = function () {
                 if (storageUrl) {
@@ -888,7 +889,7 @@ var ScriptInvoker;
             };
 
             /**
-             * Get stored train-related data from SSU server. Data is cross-session and cross-user visible.
+             * Get stored trainer-related data from SSU server. Data is cross-session and cross-user visible.
              * Value 'max_score' is rewrited by server.
              * @param callback func that will be called after fetching data, if data is fetched well.
              */
@@ -912,7 +913,7 @@ var ScriptInvoker;
 
             /**
              * Push data to shared storage.
-             * params 'max_score' is ignored, and revirited by server.
+             * params 'max_score' is ignored, and rewrited by server.
              * @param push_data - hash, data to bush
              * @param callback - callback function, run if data is pushed well
              */

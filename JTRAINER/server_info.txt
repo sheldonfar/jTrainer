@@ -1,1 +1,1 @@
-server_url=/session_start.reply
+server_url=/jtrainer/session_start.reply
