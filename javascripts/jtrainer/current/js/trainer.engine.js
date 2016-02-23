@@ -837,14 +837,12 @@ var ScriptInvoker;
                 Cogwheel.show();
                 Scorer.end();
                 is_passed = 0;
-                self.pushResultsPromise()
-                    .done(function () {
-                        Cogwheel.setText("Trainer ended!");
+                return Service.pushResultsPromise().then(function () {
+                    Cogwheel.setText("Trainer ended!");
+                    setTimeout(function () {
                         Cogwheel.hide();
-                    })
-                    .fail(function () {
-                        Cogwheel.setText("Trainer ended! But sending is fall :(");
-                    })
+                    }, 3000);
+                }).then(callback, commonAjaxFailException);
             };
 
             /**
@@ -869,7 +867,7 @@ var ScriptInvoker;
                 var arrayLength = data.length;
                 for (var i = 0; i < arrayLength; i++) {
                     var key_and_value = data[i].split('=');
-                    holder[key_and_value[0]] = decodeURIComponent(key_and_value[1].replace(/\+/g, " "));
+                    holder[key_and_value[0]] = decodeURIComponent(key_and_value[1] && key_and_value[1].replace(/\+/g, " "));
                 }
                 return holder;
             };
