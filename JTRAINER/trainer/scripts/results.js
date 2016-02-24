@@ -2,7 +2,7 @@ var results = function () {
 
     this.preDispatch = function () {
         Scorer.end();
-    }
+    };
 
     this.postDispatch = function () {
         var g = new GoogleCharts(); // Making a call to google charts api to build a column chart
@@ -20,7 +20,7 @@ var results = function () {
         var options = {
             chart: {
                 title: 'Your results',
-                subtitle: 'Step statistics for current trainer run',
+                subtitle: 'Step statistics for current trainer run'
             }
         };
 
@@ -33,7 +33,7 @@ var results = function () {
 
         if (PRODUCTION)
             Service.pushResults();
-    }
+    };
 
     this.mustache = function () {
         return {
@@ -45,4 +45,4 @@ var results = function () {
             RESULTS_POINTS_IN_PERCENT: Scorer.getScoreInPercent()
         }
     }
-}
+};

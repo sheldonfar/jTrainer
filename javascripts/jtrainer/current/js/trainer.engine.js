@@ -806,9 +806,7 @@ var ScriptInvoker;
                 if (!reportUrl)
                     throw new IllegalStateException('Server is not notified yet');
 
-                var uScore = _Scorer.getScore().toFixed(0);
-                var uScoreInPercent = (Math.floor(uScore / _Scorer.getTotalScore()) * 100).toFixed(2);
-
+                var uScoreInPercent = _Scorer.getScoreInPercent();
 
                 var userResult = {
                     total_points: 100,
@@ -818,8 +816,11 @@ var ScriptInvoker;
                     user_reply: uScoreInPercent >= 60 ? "YES - " + uScoreInPercent + "%" : "NO - " + uScoreInPercent + "%"
                 };
                 for (var key in options) {
-                    userResult[key] = options[key];
+                    if (options.hasOwnProperty(key)) {
+                        userResult[key] = options[key];
+                    }
                 }
+                LOGGER.debug("Sending user's result: " + JSON.stringify(userResult, null, 4));
                 return $.post(reportUrl, userResult)
                     .done(function (data) {
                         LOGGER.debug("RESULT: " + data);
@@ -1080,8 +1081,8 @@ var ScriptInvoker;
                         loadScripts(callback, ++i);
                     }
                 }).fail(function (jqxhr, settings, exception) {
-                    LOGGER.error("Failed to load data from source: " + sources[i]);
-                });
+                LOGGER.error("Failed to load data from source: " + sources[i]);
+            });
         };
 
         /**
@@ -1096,7 +1097,7 @@ var ScriptInvoker;
                 LOGGER.debug('Invoking commands:', commands);
                 for (var i in commands) {
                     cmd = commands[i];
-                    f = cmd[0], args = cmd[1];
+                    f = cmd[0]; args = cmd[1];
 
                     if (typeof f == "function")
                         f.apply(null, args);
@@ -1338,12 +1339,12 @@ var Map = function () {
 
 //--------------------------------ELEMENTS PART-----------------------------------------------------
 function Element() {
-    this.name,
+        this.name,
         this.label,
         this.value,
         this.attributes = '',
         this.classes = ['form-control'],
-        this.id,
+        this.id = '',
         this.style;
 
     /**
@@ -1573,7 +1574,7 @@ var LateX = null;
                 throw new NoArgumentException('Check name and value of element');
             this.removeClass('form-control');
             var result = '<label id="radios">\n';
-            result += '<input type="radio"' + this.getParams() + 'value="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '></input>\n';
+            result += '<input type="radio"' + this.getParams() + 'value="' + this.getValue() + '" ' + (checked === true ? 'checked="checked"' : '') + '>\n';
             result += '\n<span class="radio-text">';
             result += this.getLabel();
             result += '</span></label>';
@@ -1933,8 +1934,8 @@ var LateX = null;
                         if (typeof callback === "function")
                             callback(xml);
                     }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                    throw new IllegalAsyncStateException(exception);
+                });
             };
 
             /**
@@ -2488,8 +2489,8 @@ var Rotator = null;
                         }
                         callback(view, instance);
                     }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                    throw new IllegalAsyncStateException(exception);
+                });
             };
 
             /**
@@ -2505,8 +2506,8 @@ var Rotator = null;
                         LOGGER.debug(data);
                         callback(data);
                     }).fail(function (jqxhr, settings, exception) {
-                        throw new IllegalAsyncStateException(exception);
-                    });
+                    throw new IllegalAsyncStateException(exception);
+                });
             };
 
             /**
